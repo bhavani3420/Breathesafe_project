@@ -38,7 +38,16 @@ export const AuthProvider = ({ children }) => {
 
   const signup = async (userData) => {
     try {
-      const response = await axios.post('http://localhost:5000/api/auth/signup', userData);
+      // Ensure coordinates are properly formatted
+      const formattedData = {
+        ...userData,
+        coordinates: {
+          latitude: parseFloat(userData.coordinates.latitude),
+          longitude: parseFloat(userData.coordinates.longitude)
+        }
+      };
+
+      const response = await axios.post('http://localhost:5000/api/auth/signup', formattedData);
       const { token, user } = response.data;
       localStorage.setItem('token', token);
       localStorage.setItem('user', JSON.stringify(user));
@@ -52,36 +61,51 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const logout = async () => {
+  const logout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    setUser(null);
+  };
+
+  const updateProfile = async (userData) => {
     try {
       const token = localStorage.getItem('token');
-      // Fix: Authorization header should be a string, not a template literal
-      await axios.post(
-        'http://localhost:5000/api/auth/logout',
-        {},
+      const response = await axios.put(
+        'http://localhost:5000/api/auth/update-profile',
+        userData,
         {
-          headers: { Authorization: `Bearer ${token}` },
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         }
       );
+      const { user } = response.data;
+      localStorage.setItem('user', JSON.stringify(user));
+      setUser(user);
+      return { success: true };
     } catch (error) {
-      console.error('Logout error:', error);
-    } finally {
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
-      setUser(null);
+      return {
+        success: false,
+        error: error.response?.data?.message || 'Profile update failed',
+      };
     }
   };
 
-  return (
-    <AuthContext.Provider value={{ user, login, signup, logout, loading }}>
-      {children}
-    </AuthContext.Provider>
-  );
+  const value = {
+    user,
+    loading,
+    login,
+    signup,
+    logout,
+    updateProfile,
+  };
+
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
-  if (context === undefined) {
+  if (!context) {
     throw new Error('useAuth must be used within an AuthProvider');
   }
   return context;

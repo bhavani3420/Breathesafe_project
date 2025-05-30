@@ -36,6 +36,32 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: [true, 'Location is required'],
     trim: true
+  },
+  aadharNumber: {
+    type: String,
+    required: [true, 'Aadhar number is required'],
+    trim: true,
+    validate: {
+      validator: function(v) {
+        // Validate Aadhar card format (12 digits)
+        return /^\d{12}$/.test(v);
+      },
+      message: props => `${props.value} is not a valid Aadhar number!`
+    }
+  },
+  coordinates: {
+    latitude: {
+      type: Number,
+      required: [true, 'Latitude is required'],
+      min: -90,
+      max: 90
+    },
+    longitude: {
+      type: Number,
+      required: [true, 'Longitude is required'],
+      min: -180,
+      max: 180
+    }
   }
 }, {
   timestamps: true

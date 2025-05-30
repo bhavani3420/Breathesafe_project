@@ -7,7 +7,8 @@ const initialForm = {
   age: "",
   chronicDiseases: [],
   symptoms: [],
-  additionalNotes: "",
+  other: "",
+  consent: false,
 };
 
 const chronicDiseaseOptions = [
@@ -86,6 +87,8 @@ export default function ResponsiveHorizontalForm() {
         return;
       }
 
+      
+
       const response = await fetch(
         "http://localhost:5000/api/health-assessment",
         {
@@ -99,8 +102,8 @@ export default function ResponsiveHorizontalForm() {
             age: Number(form.age),
             chronicDiseases: form.chronicDiseases,
             symptoms: form.symptoms,
-            additionalNotes: form.additionalNotes.trim(),
-            timestamp: new Date().toISOString(),
+            other: form.other.trim(),
+            consent: form.consent,
           }),
         }
       );
@@ -108,14 +111,13 @@ export default function ResponsiveHorizontalForm() {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(
-          data.message || `HTTP error! status: ${response.status}`
-        );
+        throw new Error(data.message || `HTTP error! status: ${response.status}`);
       }
 
       if (data.success) {
         toast.success("Health assessment submitted successfully!");
         setForm(initialForm);
+        navigate("/");
       } else {
         throw new Error(data.message || "Failed to submit health assessment");
       }
@@ -252,7 +254,7 @@ export default function ResponsiveHorizontalForm() {
       {/* Additional Notes */}
       <div className="mt-6">
         <label
-          htmlFor="additionalNotes"
+          htmlFor="other"
           className="block mb-2 font-semibold text-gray-700 dark:text-gray-200">
           Additional Notes
           <span className="ml-2 text-sm font-normal text-gray-500">
@@ -260,15 +262,17 @@ export default function ResponsiveHorizontalForm() {
           </span>
         </label>
         <textarea
-          id="additionalNotes"
-          name="additionalNotes"
-          value={form.additionalNotes}
+          id="other"
+          name="other"
+          value={form.other}
           onChange={handleChange}
           rows={3}
           placeholder="Please mention any other conditions or symptoms you are experiencing..."
           className="w-full px-4 py-3 text-gray-900 transition border border-gray-300 rounded-lg shadow-sm bg-gray-50 dark:bg-gray-700 dark:text-white dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-primary-400"
         />
       </div>
+
+      
 
       {/* Buttons */}
       <div className="flex justify-end gap-4 mt-8">

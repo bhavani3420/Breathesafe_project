@@ -18,7 +18,7 @@ const auth = async (req, res, next) => {
 // Submit health assessment
 router.post("/", auth, async (req, res) => {
   try {
-    const { name, age, symptoms, other, consent } = req.body;
+    const { name, age, chronicDiseases, symptoms, other, consent } = req.body;
 
     // Validate required fields
     if (!name || !name.trim()) {
@@ -35,6 +35,13 @@ router.post("/", auth, async (req, res) => {
       });
     }
 
+    if (!Array.isArray(chronicDiseases)) {
+      return res.status(400).json({
+        success: false,
+        message: "Chronic diseases must be an array",
+      });
+    }
+
     if (!Array.isArray(symptoms) || symptoms.length === 0) {
       return res.status(400).json({
         success: false,
@@ -46,6 +53,7 @@ router.post("/", auth, async (req, res) => {
       userId: req.userId,
       name: name.trim(),
       age: Number(age),
+      chronicDiseases,
       symptoms,
       other: other || "",
       consent,

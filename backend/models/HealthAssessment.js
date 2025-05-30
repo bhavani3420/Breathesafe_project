@@ -17,6 +17,10 @@ const healthAssessmentSchema = new mongoose.Schema({
     min: 0,
     max: 120,
   },
+  chronicDiseases: [{
+    type: String,
+    required: true,
+  }],
   symptoms: [
     {
       type: String,

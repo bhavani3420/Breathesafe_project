@@ -31,6 +31,7 @@ const healthReportSchema = new mongoose.Schema({
       type: Number,
       required: true
     },
+    chronicDiseases: [String],
     symptoms: [String],
     other: String,
     assessmentDate: Date

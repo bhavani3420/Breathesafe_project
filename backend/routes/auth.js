@@ -8,13 +8,21 @@ const router = express.Router();
 // Signup route
 router.post('/signup', async (req, res) => {
   try {
-    const { fullName, email, password, phone, location } = req.body;
+    const { fullName, email, password, phone, location, aadharNumber, coordinates } = req.body;
     
     // Validate required fields
-    if (!fullName || !email || !password || !phone || !location) {
+    if (!fullName || !email || !password || !phone || !location || !aadharNumber || !coordinates) {
       return res.status(400).json({ 
         success: false,
         message: 'All fields are required' 
+      });
+    }
+
+    // Validate coordinates
+    if (!coordinates.latitude || !coordinates.longitude) {
+      return res.status(400).json({
+        success: false,
+        message: 'Both latitude and longitude are required'
       });
     }
 
@@ -33,7 +41,9 @@ router.post('/signup', async (req, res) => {
       email,
       password,
       phone,
-      location
+      location,
+      aadharNumber,
+      coordinates
     });
 
     await user.save();
@@ -160,7 +170,7 @@ router.post('/logout', async (req, res) => {
 // Update user profile route
 router.put('/update-profile', auth, async (req, res) => {
   try {
-    const { fullName, email, password, phone, location } = req.body;
+    const { fullName, email, password, phone, location, aadharNumber, coordinates } = req.body;
     const userId = req.user.id;
 
     // Find user
@@ -188,7 +198,9 @@ router.put('/update-profile', auth, async (req, res) => {
       fullName: user.fullName,
       email: user.email,
       phone: user.phone,
-      location: user.location
+      location: user.location,
+      aadharNumber: user.aadharNumber,
+      coordinates: user.coordinates
     };
 
     // Update fields if provided
@@ -197,6 +209,17 @@ router.put('/update-profile', auth, async (req, res) => {
     if (password) user.password = password;
     if (phone) user.phone = phone;
     if (location) user.location = location;
+    if (aadharNumber) user.aadharNumber = aadharNumber;
+    if (coordinates) {
+      if (coordinates.latitude && coordinates.longitude) {
+        user.coordinates = coordinates;
+      } else {
+        return res.status(400).json({
+          success: false,
+          message: 'Both latitude and longitude are required for coordinates'
+        });
+      }
+    }
 
     // Save the updated user
     await user.save();
@@ -207,6 +230,10 @@ router.put('/update-profile', auth, async (req, res) => {
     if (email && email !== oldValues.email) updatedFields.push(`Email: ${email}`);
     if (phone && phone !== oldValues.phone) updatedFields.push(`Phone: ${phone}`);
     if (location && location !== oldValues.location) updatedFields.push(`Location: ${location}`);
+    if (aadharNumber && aadharNumber !== oldValues.aadharNumber) updatedFields.push(`Aadhar Number: ${aadharNumber}`);
+    if (coordinates && JSON.stringify(coordinates) !== JSON.stringify(oldValues.coordinates)) {
+      updatedFields.push(`Coordinates: ${coordinates.latitude}, ${coordinates.longitude}`);
+    }
 
     if (updatedFields.length > 0) {
       await sendMail(user.email, 'settings', {
@@ -215,7 +242,6 @@ router.put('/update-profile', auth, async (req, res) => {
       });
     }
 
-    // Return updated user data
     res.json({
       success: true,
       message: 'Profile updated successfully',
@@ -224,11 +250,13 @@ router.put('/update-profile', auth, async (req, res) => {
         fullName: user.fullName,
         email: user.email,
         phone: user.phone,
-        location: user.location
+        location: user.location,
+        aadharNumber: user.aadharNumber,
+        coordinates: user.coordinates
       }
     });
   } catch (error) {
-    console.error('Profile update error:', error);
+    console.error('Error updating profile:', error);
     res.status(500).json({
       success: false,
       message: 'Error updating profile',
@@ -255,7 +283,9 @@ router.get('/me', auth, async (req, res) => {
         fullName: user.fullName,
         email: user.email,
         phone: user.phone,
-        location: user.location
+        location: user.location,
+        aadharNumber: user.aadharNumber,
+        coordinates: user.coordinates
       }
     });
   } catch (error) {

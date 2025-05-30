@@ -23,7 +23,11 @@ const SignupPage = () => {
     password: "",
     phone: "",
     location: "",
-    aadhaarNumber: "",
+    aadharNumber: "",
+    coordinates: {
+      latitude: null,
+      longitude: null
+    }
   });
   const [isLoading, setIsLoading] = useState(false);
   const [showMap, setShowMap] = useState(false);
@@ -47,6 +51,10 @@ const SignupPage = () => {
           setFormData((prev) => ({
             ...prev,
             location: `${latitude.toFixed(6)}, ${longitude.toFixed(6)}`,
+            coordinates: {
+              latitude: parseFloat(latitude.toFixed(6)),
+              longitude: parseFloat(longitude.toFixed(6))
+            }
           }));
           setShowMap(false);
           toast.success("Location captured successfully!");
@@ -259,12 +267,12 @@ const SignupPage = () => {
           </div>
         </div>
 
-        {/* Aadhaar Number */}
+        {/* Aadhar Number */}
         <div>
           <label
-            htmlFor="signup-aadhaar"
+            htmlFor="signup-aadhar"
             className="block mb-1 text-sm font-medium text-gray-700 dark:text-gray-300">
-            Aadhaar Number
+            Aadhar Number
           </label>
           <div className="relative">
             <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
@@ -272,15 +280,15 @@ const SignupPage = () => {
             </div>
             <input
               type="text"
-              id="signup-aadhaar"
-              name="aadhaarNumber"
-              value={formData.aadhaarNumber}
+              id="signup-aadhar"
+              name="aadharNumber"
+              value={formData.aadharNumber}
               onChange={handleChange}
               required
               pattern="[0-9]{12}"
               maxLength="12"
               className="block w-full py-2 pl-10 pr-3 text-gray-900 placeholder-gray-500 bg-white border border-gray-300 rounded-lg dark:border-gray-600 dark:bg-dark-700 dark:text-white focus:outline-none focus:border-primary-500 focus:shadow-[0_0_0_2px_rgba(30,144,255,0.2)] transition-colors duration-200"
-              placeholder="Enter your 12-digit Aadhaar number"
+              placeholder="Enter your 12-digit Aadhar number"
             />
           </div>
         </div>
