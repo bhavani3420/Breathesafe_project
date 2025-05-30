@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
 
 const initialForm = {
   name: "",
@@ -135,36 +134,22 @@ export default function ResponsiveHorizontalForm() {
   };
 
   return (
-    <motion.form
+    <form
       onSubmit={handleSubmit}
-      className="max-w-4xl p-8 mx-auto mt-24 mb-12 space-y-8 transition-all bg-white border border-gray-200 shadow-2xl dark:bg-gray-800 dark:border-gray-700 rounded-2xl"
-      initial={{ opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-100px" }}
-      transition={{ duration: 0.5 }}>
-      <motion.h2
-        className="mb-8 text-3xl font-bold text-center text-primary-700 dark:text-primary-300"
-        initial={{ opacity: 0, y: -20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: "-100px" }}
-        transition={{ duration: 0.5, delay: 0.2 }}>
+      className="max-w-4xl p-8 mx-auto mt-24 mb-12 space-y-8 transition-all bg-white border border-gray-200 shadow-2xl dark:bg-gray-800 dark:border-gray-700 rounded-2xl">
+      <h2 className="mb-8 text-3xl font-bold text-center text-primary-700 dark:text-primary-300">
         Respiratory Health Assessment
-      </motion.h2>
+      </h2>
 
       {/* Name and Age */}
-      <motion.div
-        className="flex flex-col gap-6 sm:flex-row"
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: "-100px" }}
-        transition={{ duration: 0.5, delay: 0.3 }}>
+      <div className="flex flex-col gap-6 sm:flex-row">
         <div className="flex flex-col flex-1">
           <label
             htmlFor="name"
             className="mb-2 font-semibold text-gray-700 dark:text-gray-200">
             Name
           </label>
-          <motion.input
+          <input
             id="name"
             name="name"
             type="text"
@@ -173,8 +158,6 @@ export default function ResponsiveHorizontalForm() {
             required
             placeholder="Enter your name"
             className="w-full px-4 py-3 text-gray-900 transition border border-gray-300 rounded-lg shadow-sm bg-gray-50 dark:bg-gray-700 dark:text-white dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-primary-400"
-            whileFocus={{ scale: 1.01 }}
-            transition={{ duration: 0.2 }}
           />
         </div>
         <div className="flex flex-col flex-1">
@@ -183,7 +166,7 @@ export default function ResponsiveHorizontalForm() {
             className="mb-2 font-semibold text-gray-700 dark:text-gray-200">
             Age
           </label>
-          <motion.input
+          <input
             id="age"
             name="age"
             type="number"
@@ -193,79 +176,44 @@ export default function ResponsiveHorizontalForm() {
             required
             placeholder="Age"
             className="w-full px-4 py-3 text-gray-900 transition border border-gray-300 rounded-lg shadow-sm bg-gray-50 dark:bg-gray-700 dark:text-white dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-primary-400"
-            whileFocus={{ scale: 1.01 }}
-            transition={{ duration: 0.2 }}
           />
         </div>
-      </motion.div>
+      </div>
 
       {/* Tabs */}
-      <motion.div
-        className="border-b border-gray-200 dark:border-gray-700"
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: "-100px" }}
-        transition={{ duration: 0.5, delay: 0.4 }}>
+      <div className="border-b border-gray-200 dark:border-gray-700">
         <nav className="flex -mb-px space-x-8">
-          <motion.button
+          <button
             type="button"
             onClick={() => setActiveTab("chronicDiseases")}
             className={`py-4 px-1 border-b-2 font-medium text-sm ${
               activeTab === "chronicDiseases"
                 ? "border-primary-500 text-primary-600"
                 : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-            }`}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}>
+            }`}>
             Chronic Diseases
-          </motion.button>
-          <motion.button
+          </button>
+          <button
             type="button"
             onClick={() => setActiveTab("symptoms")}
             className={`py-4 px-1 border-b-2 font-medium text-sm ${
               activeTab === "symptoms"
                 ? "border-primary-500 text-primary-600"
                 : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-            }`}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}>
+            }`}>
             Symptoms
-          </motion.button>
+          </button>
         </nav>
-      </motion.div>
+      </div>
 
       {/* Tab Content */}
-      <motion.div
-        className="mt-6"
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: "-100px" }}
-        transition={{ duration: 0.5, delay: 0.5 }}>
+      <div className="mt-6">
         {activeTab === "chronicDiseases" ? (
-          <motion.div
-            className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3"
-            variants={{
-              hidden: { opacity: 0 },
-              show: {
-                opacity: 1,
-                transition: {
-                  staggerChildren: 0.1,
-                },
-              },
-            }}
-            initial="hidden"
-            whileInView="show"
-            viewport={{ once: true, margin: "-100px" }}>
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3">
             {chronicDiseaseOptions.map((disease) => (
-              <motion.label
+              <label
                 key={disease}
-                className="flex items-center gap-3 p-3 transition rounded-lg cursor-pointer bg-gray-50 dark:bg-gray-700 hover:bg-primary-50 dark:hover:bg-primary-900/40"
-                variants={{
-                  hidden: { opacity: 0, x: -20 },
-                  show: { opacity: 1, x: 0 },
-                }}
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}>
+                className="flex items-center gap-3 p-3 transition rounded-lg cursor-pointer bg-gray-50 dark:bg-gray-700 hover:bg-primary-50 dark:hover:bg-primary-900/40">
                 <input
                   type="checkbox"
                   name="chronicDiseases"
@@ -277,34 +225,15 @@ export default function ResponsiveHorizontalForm() {
                 <span className="text-gray-700 dark:text-gray-200">
                   {disease}
                 </span>
-              </motion.label>
+              </label>
             ))}
-          </motion.div>
+          </div>
         ) : (
-          <motion.div
-            className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3"
-            variants={{
-              hidden: { opacity: 0 },
-              show: {
-                opacity: 1,
-                transition: {
-                  staggerChildren: 0.1,
-                },
-              },
-            }}
-            initial="hidden"
-            whileInView="show"
-            viewport={{ once: true, margin: "-100px" }}>
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3">
             {symptomOptions.map((symptom) => (
-              <motion.label
+              <label
                 key={symptom}
-                className="flex items-center gap-3 p-3 transition rounded-lg cursor-pointer bg-gray-50 dark:bg-gray-700 hover:bg-primary-50 dark:hover:bg-primary-900/40"
-                variants={{
-                  hidden: { opacity: 0, x: -20 },
-                  show: { opacity: 1, x: 0 },
-                }}
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}>
+                className="flex items-center gap-3 p-3 transition rounded-lg cursor-pointer bg-gray-50 dark:bg-gray-700 hover:bg-primary-50 dark:hover:bg-primary-900/40">
                 <input
                   type="checkbox"
                   name="symptoms"
@@ -316,19 +245,14 @@ export default function ResponsiveHorizontalForm() {
                 <span className="text-gray-700 dark:text-gray-200">
                   {symptom}
                 </span>
-              </motion.label>
+              </label>
             ))}
-          </motion.div>
+          </div>
         )}
-      </motion.div>
+      </div>
 
       {/* Additional Notes */}
-      <motion.div
-        className="mt-6"
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: "-100px" }}
-        transition={{ duration: 0.5, delay: 0.6 }}>
+      <div className="mt-6">
         <label
           htmlFor="other"
           className="block mb-2 font-semibold text-gray-700 dark:text-gray-200">
@@ -337,7 +261,7 @@ export default function ResponsiveHorizontalForm() {
             (Other conditions or symptoms not listed above)
           </span>
         </label>
-        <motion.textarea
+        <textarea
           id="other"
           name="other"
           value={form.other}
@@ -345,35 +269,24 @@ export default function ResponsiveHorizontalForm() {
           rows={3}
           placeholder="Please mention any other conditions or symptoms you are experiencing..."
           className="w-full px-4 py-3 text-gray-900 transition border border-gray-300 rounded-lg shadow-sm bg-gray-50 dark:bg-gray-700 dark:text-white dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-primary-400"
-          whileFocus={{ scale: 1.01 }}
-          transition={{ duration: 0.2 }}
         />
-      </motion.div>
+      </div>
 
       {/* Buttons */}
-      <motion.div
-        className="flex justify-end gap-4 mt-8"
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: "-100px" }}
-        transition={{ duration: 0.5, delay: 0.7 }}>
-        <motion.button
+      <div className="flex justify-end gap-4 mt-8">
+        <button
           type="button"
           onClick={handleReset}
-          className="px-6 py-2 font-medium text-gray-700 transition duration-150 ease-in-out bg-gray-100 rounded-lg hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}>
+          className="px-6 py-2 font-medium text-gray-700 transition duration-150 ease-in-out bg-gray-100 rounded-lg hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600">
           Reset Form
-        </motion.button>
-        <motion.button
+        </button>
+        <button
           type="submit"
           disabled={submitting}
-          className="px-6 py-2 font-medium text-white transition duration-150 ease-in-out rounded-lg bg-primary-600 hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed"
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}>
+          className="px-6 py-2 font-medium text-white transition duration-150 ease-in-out rounded-lg bg-primary-600 hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed">
           {submitting ? "Submitting..." : "Submit Assessment"}
-        </motion.button>
-      </motion.div>
-    </motion.form>
+        </button>
+      </div>
+    </form>
   );
 }
