@@ -18,11 +18,11 @@ const AboutPage = () => {
 
   const handleButtonClick = (path) => {
     if (!user) {
-      navigate('/login', { 
-        state: { 
+      navigate("/login", {
+        state: {
           background: location,
-          from: path 
-        } 
+          from: path,
+        },
       });
     } else {
       navigate(path);
@@ -73,28 +73,8 @@ const AboutPage = () => {
 
   return (
     <div className="pt-16">
-      {/* Hero Section */}
-      <section className="relative pt-32 pb-20 overflow-hidden bg-gradient-to-br from-primary-500 to-primary-600">
-        <div className="absolute inset-0 bg-black/20" />
-        <div className="relative container-custom">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="max-w-3xl mx-auto text-center">
-            <h1 className="mb-4 text-4xl font-bold text-white sm:text-5xl">
-              About BreatheSafe
-            </h1>
-            <p className="mb-8 text-lg text-white/90">
-              Empowering communities with real-time air quality data and
-              personalized health insights.
-            </p>
-          </motion.div>
-        </div>
-      </section>
-
       {/* Mission Section */}
-      <section className="section bg-white dark:bg-dark-800">
+      <section className="section bg-white dark:bg-dark-800 pt-20">
         <div className="container-custom">
           <motion.div
             className="max-w-3xl mx-auto text-center"
@@ -114,15 +94,13 @@ const AboutPage = () => {
             </p>
             <div className="flex flex-col justify-center gap-4 sm:flex-row">
               <button
-                onClick={() => handleButtonClick('/live-aqi')}
-                className="btn-primary"
-              >
+                onClick={() => handleButtonClick("/live-aqi")}
+                className="btn-primary">
                 Check Your Air Quality
               </button>
               <button
-                onClick={() => handleButtonClick('/forecasting')}
-                className="btn-secondary"
-              >
+                onClick={() => handleButtonClick("/forecasting")}
+                className="btn-secondary">
                 View AQI Forecast
               </button>
             </div>

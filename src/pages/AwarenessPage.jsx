@@ -186,20 +186,19 @@ const DiseaseInfoPage = () => {
   );
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-dark-900 ">
+    <div className="min-h-screen bg-gray-50 dark:bg-dark-900">
       {/* Hero Section */}
-      <div className="relative pt-32 pb-20 overflow-hidden bg-gradient-to-br from-primary-500 to-primary-600 mt-20">
-        <div className="absolute inset-0 bg-black/20" />
+      <div className="relative pt-32 pb-20 overflow-hidden">
         <div className="relative container-custom">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
             className="max-w-3xl mx-auto text-center">
-            <h1 className="mb-4 text-4xl font-bold text-white sm:text-5xl">
+            <h1 className="mb-4 text-4xl font-bold text-gray-900 dark:text-white sm:text-5xl">
               Airborne Disease Information
             </h1>
-            <p className="mb-8 text-lg text-white/90">
+            <p className="mb-8 text-lg text-gray-700 dark:text-gray-300">
               Learn about common airborne diseases and their relationship with
               air quality
             </p>
@@ -214,7 +213,7 @@ const DiseaseInfoPage = () => {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search diseases, symptoms, or pollutants..."
-                className="w-full py-3 pl-12 pr-4 text-gray-900 bg-white rounded-lg shadow-lg focus:outline-none focus:ring-2 focus:ring-primary-400 dark:bg-dark-800 dark:text-white dark:placeholder-gray-400"
+                className="w-full py-3 pl-12 pr-4 text-gray-900 bg-white rounded-lg shadow-lg focus:outline-none focus:ring-2 focus:ring-gray-400 dark:bg-dark-800 dark:text-white dark:placeholder-gray-400"
               />
             </div>
           </motion.div>
@@ -239,7 +238,7 @@ const DiseaseInfoPage = () => {
               <div className="p-6 border-b border-gray-200 dark:border-dark-700">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-3">
-                    <div className="p-2 text-primary-500 bg-primary-50 dark:bg-primary-900/30 rounded-lg">
+                    <div className="p-2 text-gray-700 bg-gray-100 dark:bg-gray-700 dark:text-gray-300 rounded-lg">
                       {disease.icon}
                     </div>
                     <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
@@ -277,7 +276,7 @@ const DiseaseInfoPage = () => {
                       <li
                         key={symptom}
                         className="flex items-center text-gray-600 dark:text-gray-300">
-                        <span className="w-1.5 h-1.5 mr-2 bg-primary-500 rounded-full" />
+                        <span className="w-1.5 h-1.5 mr-2 bg-gray-500 rounded-full" />
                         {symptom}
                       </li>
                     ))}
@@ -303,7 +302,7 @@ const DiseaseInfoPage = () => {
                     {disease.pollutants.map((pollutant) => (
                       <span
                         key={pollutant}
-                        className="px-3 py-1 text-sm text-primary-700 bg-primary-50 dark:bg-primary-900/30 dark:text-primary-300 rounded-full">
+                        className="px-3 py-1 text-sm text-gray-700 bg-gray-100 dark:bg-gray-700 dark:text-gray-300 rounded-full">
                         {pollutant}
                       </span>
                     ))}
