@@ -254,81 +254,41 @@ const HealthReportDetail = () => {
                 </div>
               </section>
 
-              {/* Recommendations */}
+              {/* Health-Specific Recommendations */}
               <section className="p-6 bg-gray-50 dark:bg-dark-700 rounded-lg">
-                <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">Health Recommendations</h2>
+                <div className="flex items-center mb-6">
+                  <FiShield className="w-6 h-6 text-primary-500 mr-3" />
+                  <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Health Recommendations</h2>
+                </div>
                 
-                {/* General Recommendations */}
-                <div className="mb-6">
-                  <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-3">General Recommendations</h3>
-                  <div className="space-y-3">
-                    {report.report?.generalRecommendations?.map((rec, index) => (
-                      <div key={index} className="p-4 bg-white dark:bg-dark-800 rounded-lg shadow-sm">
-                        <p className="text-gray-700 dark:text-gray-300">{rec}</p>
-                      </div>
-                    )) || <p className="text-gray-500">No general recommendations available</p>}
-                  </div>
+                <div className="space-y-6">
+                  {report.report?.healthSpecificRecommendations?.map((rec, index) => (
+                    <div key={index} className="p-4 bg-white dark:bg-dark-800 rounded-lg shadow-sm">
+                      <p className="text-gray-700 dark:text-gray-300 leading-relaxed">{rec}</p>
+                    </div>
+                  )) || <p className="text-gray-500">No health-specific recommendations available</p>}
                 </div>
 
-                {/* Age-Specific Recommendations */}
-                <div className="mb-6">
-                  <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-3">Age-Specific Recommendations</h3>
-                  <div className="space-y-3">
-                    {report.report?.ageSpecificRecommendations?.map((rec, index) => (
-                      <div key={index} className="p-4 bg-white dark:bg-dark-800 rounded-lg shadow-sm">
-                        <p className="text-gray-700 dark:text-gray-300">{rec}</p>
-                  </div>
-                    )) || <p className="text-gray-500">No age-specific recommendations available</p>}
-                  </div>
-                  </div>
-
-                {/* Health-Specific Recommendations */}
-                <div className="mb-6">
-                  <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-3">Health-Specific Recommendations</h3>
-                  <div className="space-y-3">
-                    {report.report?.healthSpecificRecommendations?.map((rec, index) => (
-                      <div key={index} className="p-4 bg-white dark:bg-dark-800 rounded-lg shadow-sm">
-                        <p className="text-gray-700 dark:text-gray-300">{rec}</p>
-                      </div>
-                    )) || <p className="text-gray-500">No health-specific recommendations available</p>}
-                  </div>
-                </div>
-
-                {/* Activity Guidelines */}
-                <div className="mb-6">
-                  <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-3">Activity Guidelines</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div className="p-4 bg-white dark:bg-dark-800 rounded-lg shadow-sm">
-                      <h4 className="font-medium text-gray-900 dark:text-white mb-2">Outdoor Activities</h4>
-                      <p className="text-gray-700 dark:text-gray-300">{report.outdoorActivitySafety?.recommendation || 'No outdoor activity guidelines available'}</p>
-                    </div>
-                    <div className="p-4 bg-white dark:bg-dark-800 rounded-lg shadow-sm">
-                      <h4 className="font-medium text-gray-900 dark:text-white mb-2">Indoor Activities</h4>
-                      <p className="text-gray-700 dark:text-gray-300">{report.report?.activityGuidelines?.indoor || 'No indoor activity guidelines available'}</p>
-                    </div>
-                    <div className="p-4 bg-white dark:bg-dark-800 rounded-lg shadow-sm">
-                      <h4 className="font-medium text-gray-900 dark:text-white mb-2">Exercise</h4>
-                      <p className="text-gray-700 dark:text-gray-300">{report.report?.activityGuidelines?.exercise || 'No exercise guidelines available'}</p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Medication Recommendations */}
-                <div className="mb-6">
-                  <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-3">Medication Recommendations</h3>
+                {/* Outdoor Activity Safety */}
+                <div className="mt-8">
+                  <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">Outdoor Activities</h3>
                   <div className="p-4 bg-white dark:bg-dark-800 rounded-lg shadow-sm">
-                    <p className="text-gray-700 dark:text-gray-300">{report.medicationRecommendations?.specific || 'No specific medication recommendations available'}</p>
+                    <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
+                      {report.outdoorActivitySafety?.recommendation || 'No outdoor activity recommendations available'}
+                    </p>
                   </div>
-              </div>
-              
+                </div>
+
                 {/* Mask Recommendations */}
-                <div className="mb-6">
-                  <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-3">Mask Recommendations</h3>
+                <div className="mt-8">
+                  <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">Mask Guidance</h3>
                   <div className="p-4 bg-white dark:bg-dark-800 rounded-lg shadow-sm">
-                    <p className="text-gray-700 dark:text-gray-300">{report.maskRecommendations?.usage || 'No mask recommendations available'}</p>
+                    <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
+                      {report.maskRecommendations?.usage || 'No mask recommendations available'}
+                    </p>
                     {report.maskRecommendations?.type && (
                       <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
-                        Recommended mask type: {report.maskRecommendations.type}
+                        Recommended mask: {report.maskRecommendations.type}
                       </p>
                     )}
                   </div>
