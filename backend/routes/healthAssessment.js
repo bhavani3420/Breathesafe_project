@@ -42,8 +42,6 @@ router.post("/", auth, async (req, res) => {
       });
     }
 
-   
-
     const assessment = new HealthAssessment({
       userId: req.userId,
       name: name.trim(),

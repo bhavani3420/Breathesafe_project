@@ -1,4 +1,4 @@
-import { useState}  from "react";
+import { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   FiUser,
@@ -8,7 +8,9 @@ import {
   FiEyeOff,
   FiMapPin,
   FiPhone,
-} from "react-icons/fi"; // Added FiPhone
+  FiMap,
+  FiCreditCard,
+} from "react-icons/fi";
 import { toast } from "react-toastify";
 import Modal from "../components/common/Modal";
 import { useAuth } from "../context/AuthContext";
@@ -19,14 +21,47 @@ const SignupPage = () => {
     fullName: "",
     email: "",
     password: "",
-    phone: "", // <-- Added phone here
+    phone: "",
     location: "",
+    aadhaarNumber: "",
   });
   const [isLoading, setIsLoading] = useState(false);
+  const [showMap, setShowMap] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
   const { signup } = useAuth();
   const isModal = location.state?.background;
+
+  useEffect(() => {
+    // Initialize map when component mounts
+    if (showMap) {
+      initializeMap();
+    }
+  }, [showMap]);
+
+  const initializeMap = () => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords;
+          setFormData((prev) => ({
+            ...prev,
+            location: `${latitude.toFixed(6)}, ${longitude.toFixed(6)}`,
+          }));
+          setShowMap(false);
+          toast.success("Location captured successfully!");
+        },
+        (error) => {
+          console.error("Error getting location:", error);
+          toast.error("Failed to get location. Please try again.");
+          setShowMap(false);
+        }
+      );
+    } else {
+      toast.error("Geolocation is not supported by your browser");
+      setShowMap(false);
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -69,6 +104,10 @@ const SignupPage = () => {
     navigate("/login", {
       state: { background: location.state?.background || location },
     });
+  };
+
+  const handleMapClick = () => {
+    setShowMap(true);
   };
 
   const content = (
@@ -189,8 +228,8 @@ const SignupPage = () => {
           </div>
         </div>
 
-        {/* Location */}
-        <div className="pb-5">
+        {/* Location with Map */}
+        <div>
           <label
             htmlFor="signup-location"
             className="block mb-1 text-sm font-medium text-gray-700 dark:text-gray-300">
@@ -207,8 +246,41 @@ const SignupPage = () => {
               value={formData.location}
               onChange={handleChange}
               required
+              className="block w-full py-2 pl-10 pr-10 text-gray-900 placeholder-gray-500 bg-white border border-gray-300 rounded-lg dark:border-gray-600 dark:bg-dark-700 dark:text-white focus:outline-none focus:border-primary-500 focus:shadow-[0_0_0_2px_rgba(30,144,255,0.2)] transition-colors duration-200"
+              placeholder="Enter latitude, longitude"
+              readOnly
+            />
+            <button
+              type="button"
+              onClick={handleMapClick}
+              className="absolute inset-y-0 right-0 flex items-center pr-3 hover:text-primary-500 transition-colors duration-200">
+              <FiMap className="w-4 h-4 text-gray-400" />
+            </button>
+          </div>
+        </div>
+
+        {/* Aadhaar Number */}
+        <div>
+          <label
+            htmlFor="signup-aadhaar"
+            className="block mb-1 text-sm font-medium text-gray-700 dark:text-gray-300">
+            Aadhaar Number
+          </label>
+          <div className="relative">
+            <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+              <FiCreditCard className="w-4 h-4 text-gray-400" />
+            </div>
+            <input
+              type="text"
+              id="signup-aadhaar"
+              name="aadhaarNumber"
+              value={formData.aadhaarNumber}
+              onChange={handleChange}
+              required
+              pattern="[0-9]{12}"
+              maxLength="12"
               className="block w-full py-2 pl-10 pr-3 text-gray-900 placeholder-gray-500 bg-white border border-gray-300 rounded-lg dark:border-gray-600 dark:bg-dark-700 dark:text-white focus:outline-none focus:border-primary-500 focus:shadow-[0_0_0_2px_rgba(30,144,255,0.2)] transition-colors duration-200"
-              placeholder="Enter your location"
+              placeholder="Enter your 12-digit Aadhaar number"
             />
           </div>
         </div>
