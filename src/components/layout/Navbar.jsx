@@ -43,12 +43,15 @@ const Navbar = () => {
   const navLinks = [
     { path: "/", label: "Home" },
     { path: "/about", label: "About" },
-    ...(user ? [
-      { path: "/live-aqi", label: "Live AQI Tracker" },
-      { path: "/forecasting", label: "AQI Forecasting" },
-      { path: "/form-input", label: "Health Assessment" },
-      { path: "/dashboard", label: "Dashboard" },
-    ] : []),
+    { path: "/disease-info", label: "Disease Info" },
+    ...(user
+      ? [
+          { path: "/live-aqi", label: "Live AQI Tracker" },
+          { path: "/forecasting", label: "AQI Forecasting" },
+          { path: "/form-input", label: "Health Assessment" },
+          { path: "/dashboard", label: "Dashboard" },
+        ]
+      : []),
   ];
 
   return (
@@ -79,8 +82,7 @@ const Navbar = () => {
                     location.pathname === path
                       ? activeLinkClasses
                       : "text-gray-700 dark:text-gray-300"
-                  }`}
-                >
+                  }`}>
                   {label}
                 </Link>
               ))}
@@ -167,8 +169,7 @@ const Navbar = () => {
                     ? activeLinkClasses
                     : "text-gray-700 dark:text-gray-300"
                 }`}
-                onClick={closeMenu}
-              >
+                onClick={closeMenu}>
                 {label}
               </Link>
             ))}

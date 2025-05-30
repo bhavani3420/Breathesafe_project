@@ -79,7 +79,7 @@ const LoginPage = () => {
               value={formData.email}
               onChange={handleChange}
               required
-              className="block w-full py-2 pl-10 pr-3 text-gray-900 placeholder-gray-500 bg-white border border-gray-300 rounded-lg dark:border-gray-600 dark:bg-dark-700 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              className="block w-full py-2 pl-10 pr-3 text-gray-900 placeholder-gray-500 bg-white border border-gray-300 rounded-lg dark:border-gray-600 dark:bg-dark-700 dark:text-white focus:outline-none focus:border-primary-500 focus:shadow-[0_0_0_2px_rgba(30,144,255,0.2)] transition-colors duration-200"
               placeholder="Enter your email"
             />
           </div>
@@ -102,7 +102,7 @@ const LoginPage = () => {
               value={formData.password}
               onChange={handleChange}
               required
-              className="block w-full py-2 pl-10 pr-10 text-gray-900 placeholder-gray-500 bg-white border border-gray-300 rounded-lg dark:border-gray-600 dark:bg-dark-700 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              className="block w-full py-2 pl-10 pr-10 text-gray-900 placeholder-gray-500 bg-white border border-gray-300 rounded-lg dark:border-gray-600 dark:bg-dark-700 dark:text-white focus:outline-none focus:border-primary-500 focus:shadow-[0_0_0_2px_rgba(30,144,255,0.2)] transition-colors duration-200"
               placeholder="Enter your password"
             />
             <button

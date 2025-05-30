@@ -17,6 +17,7 @@ import SignupPage from "./pages/SignupPage";
 import AboutPage from "./pages/AboutPage";
 import RespiratoryIssuesForm from "./pages/RespiratoryIssuesForm"; // See below
 import HealthAdvisoryDetails from "./pages/HealthReportDetail";
+import DiseaseInfoPage from "./pages/AwarenessPage";
 import ChatBot from "./context/ChatBot";
 
 function App() {
@@ -53,26 +54,38 @@ function App() {
               toastStyle={{
                 background: isDarkMode ? "#23263A" : "#fff",
                 color: isDarkMode ? "#fff" : "#000",
-                boxShadow: isDarkMode 
-                  ? "0 4px 12px rgba(0, 0, 0, 0.3)" 
-                  : "0 4px 12px rgba(0, 0, 0, 0.1)"
+                boxShadow: isDarkMode
+                  ? "0 4px 12px rgba(0, 0, 0, 0.3)"
+                  : "0 4px 12px rgba(0, 0, 0, 0.1)",
               }}
             />
             {!isDashboard && <Navbar />}
-            
+
             <main className="flex-grow">
               <AnimatePresence mode="wait">
-                <Routes location={background || location} key={(background || location).pathname}>
+                <Routes
+                  location={background || location}
+                  key={(background || location).pathname}>
                   <Route path="/" element={<HomePage />} />
                   <Route path="/about" element={<AboutPage />} />
+                  <Route path="/disease-info" element={<DiseaseInfoPage />} />
                   <Route path="/live-aqi" element={<LiveAQIPage />} />
                   <Route path="/forecasting" element={<ForecastingPage />} />
-                  <Route path="/form-input" element={<RespiratoryIssuesForm />} />
+                  <Route
+                    path="/form-input"
+                    element={<RespiratoryIssuesForm />}
+                  />
                   <Route path="/dashboard" element={<DashboardPage />} />
                   <Route path="/login" element={<LoginPage />} />
                   <Route path="/signup" element={<SignupPage />} />
-                  <Route path="/advisory-details" element={<HealthAdvisoryDetails />} />
-                  <Route path="/health-reports/:id" element={<HealthAdvisoryDetails />} />
+                  <Route
+                    path="/advisory-details"
+                    element={<HealthAdvisoryDetails />}
+                  />
+                  <Route
+                    path="/health-reports/:id"
+                    element={<HealthAdvisoryDetails />}
+                  />
                 </Routes>
               </AnimatePresence>
 
