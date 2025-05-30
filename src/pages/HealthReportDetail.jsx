@@ -126,7 +126,7 @@ const HealthReportDetail = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-dark-900">
+    <div className="min-h-screen bg-gray-50 dark:bg-dark-900 mt-12">
       <div className="container-custom py-8">
         <div className="max-w-4xl mx-auto">
           <motion.div
@@ -139,11 +139,11 @@ const HealthReportDetail = () => {
             <div className="p-6 border-b border-gray-200 dark:border-dark-700">
               <div className="flex items-center justify-between">
                 <Link
-                  to="/dashboard"
+                  to="/live-aqi"
                   className="flex items-center text-primary-500 hover:text-primary-600 transition-colors"
           >
             <FiArrowLeft className="w-5 h-5 mr-2" />
-                  Back to Dashboard
+                  Back to LiveAqi
           </Link>
                 <button
                   onClick={downloadReport}
