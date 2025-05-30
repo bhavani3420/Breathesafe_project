@@ -45,6 +45,8 @@ const AQICard = ({ aqiData, coordinates, isLoading }) => {
   const safeAQIValue = typeof aqiData?.value === 'number' ? aqiData.value : 0;
   const safeStatus = aqiData?.status || 'Loading...';
   const safeUpdated = aqiData?.updated || '';
+  const safeTemperature = aqiData?.temperature !== null ? aqiData?.temperature : null;
+  const safeTemperatureUnit = aqiData?.temperatureUnit || '°C';
   const statusColor = getStatusColor(safeStatus);
   const colorClass = getColorClass(statusColor);
 
@@ -81,6 +83,11 @@ const AQICard = ({ aqiData, coordinates, isLoading }) => {
         <h3 className="mt-4 text-2xl font-semibold text-gray-900 dark:text-white">
           {safeStatus}
         </h3>
+        {safeTemperature !== null && (
+          <div className="mt-2 text-lg text-gray-700 dark:text-gray-300">
+            <span className="font-medium">Temperature:</span> {safeTemperature}{safeTemperatureUnit}
+          </div>
+        )}
       </div>
     </motion.div>
   );
@@ -93,6 +100,8 @@ AQICard.propTypes = {
     color: PropTypes.string,
     pollutants: PropTypes.array,
     updated: PropTypes.string,
+    temperature: PropTypes.number,
+    temperatureUnit: PropTypes.string,
   }),
   coordinates: PropTypes.shape({
     latitude: PropTypes.number,

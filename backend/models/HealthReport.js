@@ -20,6 +20,8 @@ const healthReportSchema = new mongoose.Schema({
       value: Number,
       unit: String
     }],
+    temperature: Number,
+    temperatureUnit: String,
     timestamp: Date
   },
   healthData: {
@@ -31,7 +33,20 @@ const healthReportSchema = new mongoose.Schema({
       type: Number,
       required: true
     },
-    chronicDiseases: [String],
+    chronicDiseases: [{
+      name: {
+        type: String,
+        required: true
+      },
+      severity: {
+        type: String,
+        enum: ['Mild', 'Moderate', 'Severe'],
+        default: 'Moderate'
+      },
+      diagnosisYear: Number,
+      medications: [String],
+      notes: String
+    }],
     symptoms: [String],
     other: String,
     assessmentDate: Date
@@ -46,6 +61,45 @@ const healthReportSchema = new mongoose.Schema({
     generalRecommendations: [String],
     ageSpecificRecommendations: [String],
     healthSpecificRecommendations: [String],
+    chronicDiseaseAnalysis: [{
+      diseaseName: String,
+      highlighted: {
+        type: Boolean,
+        default: true
+      },
+      riskLevel: {
+        type: String,
+        enum: ['Low', 'Moderate', 'High', 'Severe'],
+        default: 'Moderate'
+      },
+      aqiImpact: String,
+      recommendations: [String],
+      precautions: [String],
+      medicationAdjustments: String,
+      symptoms: [{
+        name: String,
+        severity: {
+          type: String,
+          enum: ['Mild', 'Moderate', 'Severe'],
+          default: 'Moderate'
+        },
+        triggers: [String],
+        managementTips: [String]
+      }],
+      lifestyleRecommendations: {
+        diet: [String],
+        exercise: [String],
+        stressManagement: [String],
+        sleep: [String]
+      },
+      emergencySigns: [String],
+      followUpSchedule: {
+        frequency: String,
+        nextAppointment: Date,
+        monitoringParameters: [String]
+      }
+    }],
+    medicationGuidance: [String],
     medicationRecommendations: {
       general: String,
       specific: {
@@ -64,6 +118,23 @@ const healthReportSchema = new mongoose.Schema({
       type: Date,
       default: Date.now
     }
+  },
+  oxygenRecommendations: {
+    isRecommended: Boolean,
+    recommendation: String,
+    level: String
+  },
+  airQualityImpact: {
+    overallImpact: String,
+    chronicDiseaseImpacts: [{
+      diseaseName: String,
+      impactLevel: {
+        type: String,
+        enum: ['Minimal', 'Moderate', 'Significant', 'Severe'],
+        default: 'Moderate'
+      },
+      details: String
+    }]
   }
 });
 

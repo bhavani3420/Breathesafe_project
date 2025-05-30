@@ -176,16 +176,31 @@ const LiveAQIPage = () => {
     setSearchError('');
     
     try {
-      const url = `https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${lat}&longitude=${lon}&hourly=pm10,pm2_5,carbon_monoxide,nitrogen_dioxide,sulphur_dioxide,ozone,us_aqi`;
+      // Fetch AQI data
+      const aqiUrl = `https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${lat}&longitude=${lon}&hourly=pm10,pm2_5,carbon_monoxide,nitrogen_dioxide,sulphur_dioxide,ozone,us_aqi`;
       
+      // Fetch temperature data from Open Meteo API
+      const weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m&timezone=auto`;
       
-      const resp = await fetch(url, { signal: controller.signal });
-      if (!resp.ok) {
-        throw new Error(`HTTP error! status: ${resp.status}`);
+      // Fetch both AQI and temperature data in parallel
+      const [aqiResp, weatherResp] = await Promise.all([
+        fetch(aqiUrl, { signal: controller.signal }),
+        fetch(weatherUrl, { signal: controller.signal })
+      ]);
+      
+      if (!aqiResp.ok) {
+        throw new Error(`HTTP error for AQI data! status: ${aqiResp.status}`);
       }
       
-      const data = await resp.json();
-      console.log(data);
+      if (!weatherResp.ok) {
+        throw new Error(`HTTP error for weather data! status: ${weatherResp.status}`);
+      }
+      
+      const data = await aqiResp.json();
+      const weatherData = await weatherResp.json();
+      
+      console.log('AQI data:', data);
+      console.log('Weather data:', weatherData);
 
       // Validate data structure
       if (!data?.hourly?.us_aqi || !Array.isArray(data.hourly.us_aqi)) {
@@ -227,12 +242,18 @@ const LiveAQIPage = () => {
       const aqiStatus = getAQIStatus(aqiValue);
       const aqiColor = getAQIColor(aqiValue);
 
+      // Extract temperature from weather data
+      const temperature = weatherData.current?.temperature_2m || null;
+      const temperatureUnit = weatherData.current_units?.temperature_2m || '°C';
+      
       const newAqiData = {
         value: aqiValue,
         status: aqiStatus,
         color: aqiColor,
         pollutants,
-        updated: data.hourly.time[idx]
+        updated: data.hourly.time[idx],
+        temperature: temperature,
+        temperatureUnit: temperatureUnit
       };
       setAqiData(newAqiData);
 
@@ -492,7 +513,9 @@ const LiveAQIPage = () => {
           aqiData: {
             value: aqiData.value,
             status: aqiData.status,
-            pollutants: aqiData.pollutants
+            pollutants: aqiData.pollutants,
+            temperature: aqiData.temperature,
+            temperatureUnit: aqiData.temperatureUnit
           }
         })
       });

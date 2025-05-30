@@ -70,46 +70,79 @@ router.post('/generate', auth, async (req, res) => {
       });
     }
 
-    // Enhanced prompt for Gemini with detailed age-specific analysis and specific medicine recommendations
-    const prompt = `You are a friendly health advisor helping people understand how air quality affects their health. Use simple, clear language that anyone can understand. Focus on how current air quality might affect their specific health issues.
+    // Enhanced prompt for Gemini with detailed analysis and specific recommendations based on all inputs
+    const prompt = `You are an advanced health advisor helping people understand how air quality affects their health. Use simple, clear language that anyone can understand. Focus on providing personalized recommendations based on all the input factors.
 
-    Current Air Quality:
+    Current Environmental Conditions:
     - AQI Value: ${aqiData.value}
     - Air Quality Level: ${aqiData.status}
+    - Temperature: ${aqiData.temperature !== undefined ? `${aqiData.temperature}${aqiData.temperatureUnit || '°C'}` : 'Not available'}
+    - Pollutants: ${aqiData.pollutants.map(p => `${p.label}: ${p.value} ${p.unit}`).join(', ')}
     - Time: ${new Date().toLocaleTimeString()}
     - Date: ${new Date().toLocaleDateString()}
     
-    User's Health Info:
+    User's Health Profile:
     - Name: ${healthAssessment.name}
     - Age: ${healthAssessment.age} years
-    - Health Issues: ${healthAssessment.symptoms.join(', ')}
+    - Health Symptoms: ${healthAssessment.symptoms.join(', ')}
+    - Chronic Diseases: ${healthAssessment.chronicDiseases ? healthAssessment.chronicDiseases.join(', ') : 'None reported'}
     ${healthAssessment.other ? `- Other Health Info: ${healthAssessment.other}` : ''}
     
-    Provide comprehensive health recommendations that include:
+    I need you to provide a comprehensive health analysis that includes:
 
-    1. Age-Specific Recommendations:
-    - For children (0-12): Focus on indoor activities, school precautions, and growth-related concerns
-    - For teens (13-19): Focus on sports activities, school activities, and development
-    - For adults (20-59): Focus on work-related activities, exercise, and daily routines
-    - For seniors (60+): Focus on mobility, existing conditions, and preventive care
+    1. SYMPTOM-SPECIFIC RECOMMENDATIONS:
+    For each reported symptom, provide a detailed analysis of:
+    - How the current air quality and temperature specifically affect this symptom
+    - Clear guidance on what the user should do to manage this symptom
+    - When they should be extra cautious based on AQI and temperature
+    - Format each recommendation with the symptom name as a heading followed by the advice
 
-    2. Health-Specific Recommendations for each issue:
-    - How current air quality affects this issue
-    - What they should do to stay safe
-    - When they should be extra careful
-    - Specific precautions based on AQI level
+    2. CHRONIC DISEASE RECOMMENDATIONS:
+    For each chronic disease reported, provide detailed analysis of:
+    - How the current air quality (AQI: ${aqiData.value}) affects this specific condition
+    - How each pollutant (${aqiData.pollutants.map(p => p.name + ': ' + p.value + ' ' + p.unit).join(', ')}) impacts this disease
+    - How current temperature (${aqiData.temperature}${aqiData.temperatureUnit}) might exacerbate or alleviate symptoms
+    - Specific precautions to take for managing this condition in current air quality
+    - Warning signs requiring immediate medical attention
+    - Medication adjustments that might be necessary
+    - HIGHLIGHT the disease name in all recommendations for better visibility
 
-    3. General Recommendations:
-    - Indoor air quality management
-    - Daily activity modifications
-    - Preventive measures
-    - Emergency preparedness
+    3. AGE-SPECIFIC RECOMMENDATIONS:
+    Based on the user's age (${healthAssessment.age}) and health profile, provide tailored advice that considers:
+    - Age-appropriate activity modifications during current conditions
+    - Special precautions based on age group, chronic diseases, and current AQI/temperature
+    - Whether the user can go outside or should stay indoors
+    - Make this practical and immediately actionable
 
-    4. Medication Guidance:
-    - Current medication adjustments if needed
-    - Over-the-counter options for symptoms
-    - When to consult a doctor
-    - Emergency medication protocols
+    3. OUTDOOR ACTIVITY GUIDANCE:
+    Provide clear guidance on outdoor activities that:
+    - Explicitly states whether outdoor activities are safe or not
+    - Explains in simple terms how current conditions affect outdoor safety
+    - Suggests specific times of day that might be safer (if any)
+    - Recommends alternative activities if outdoors is unsafe
+
+    4. MASK RECOMMENDATIONS:
+    Provide specific mask guidance that:
+    - Clearly states whether masks are recommended based on AQI, temperature, and health conditions
+    - Specifies exactly what type of mask would be most effective (N95, surgical, etc.)
+    - Explains how temperature affects mask effectiveness and comfort
+    - Provides practical advice on mask usage in current conditions
+
+    5. OXYGEN SUPPORT GUIDANCE:
+    Analyze whether the user might need oxygen support based on:
+    - Their chronic diseases (especially respiratory conditions)
+    - Current AQI level and pollutant concentrations
+    - Provide a clear recommendation on whether oxygen support is advised
+    - If recommended, suggest appropriate oxygen levels/flow rates
+    - Use simple language that makes this seem like an ML-based recommendation
+
+    6. MEDICATION GUIDANCE:
+    Provide medication recommendations that:
+    - Address each specific health symptom and chronic disease
+    - Consider how current air quality and temperature might affect medication needs
+    - Include both preventive and reactive medication options
+    - Clearly state when to consult a doctor
+    - Format as clear, separate recommendations for different medication types
 
     Return a JSON object with this EXACT structure. Do not include any text before or after the JSON object:
     {
@@ -118,43 +151,72 @@ router.post('/generate', auth, async (req, res) => {
         "ageGroup": "${healthAssessment.age < 18 ? 'Child' : healthAssessment.age < 60 ? 'Adult' : 'Senior'}",
         "riskLevel": "${aqiData.value > 150 ? 'High' : aqiData.value > 100 ? 'Medium' : 'Low'}"
       },
-      "ageSpecificRecommendations": {
-        "dailyActivities": "Age-appropriate activity recommendations",
-        "precautions": "Age-specific precautions",
-        "specialConsiderations": "Special considerations for this age group"
-      },
+      "ageSpecificRecommendations": [
+        "Age-specific daily activity recommendations considering chronic conditions and symptoms",
+        "Age-specific precautions for current air quality and temperature",
+        "Special considerations for this age group with these health conditions"
+      ],
       "healthSpecificRecommendations": [
+        "Symptom Name: Detailed recommendation for this symptom",
+        "Another Symptom: How air quality affects this symptom and what to do"
+      ],
+      "chronicDiseaseAnalysis": [
         {
-          "issue": "Health issue name",
-          "effect": "How air quality affects this issue",
-          "safetyMeasures": "What they should do",
-          "extraCare": "When to be extra careful",
-          "medicationAdvice": "Specific medication guidance for this issue"
+          "diseaseName": "Disease Name",
+          "highlighted": true,
+          "riskLevel": "Moderate",
+          "aqiImpact": "How current AQI affects this disease specifically",
+          "recommendations": [
+            "Specific recommendation for this disease in current air quality",
+            "Medication adjustments if needed",
+            "When to seek medical attention"
+          ],
+          "precautions": [
+            "Indoor precautions for this condition",
+            "Outdoor activity limitations"
+          ],
+          "medicationAdjustments": "Specific medication guidance for this condition"
         }
       ],
-      "generalRecommendations": {
-        "indoorAirQuality": "Tips for maintaining good indoor air quality",
-        "activityModifications": "How to modify daily activities",
-        "preventiveMeasures": "General preventive measures",
-        "emergencyProtocols": "What to do in case of severe symptoms"
+      "pollutantImpacts": {
+        "overall": "Overall assessment of how current pollutants affect reported conditions",
+        "specificImpacts": [
+          {
+            "pollutant": "PM2.5",
+            "impact": "How this pollutant affects reported chronic diseases",
+            "mitigationSteps": "Steps to reduce exposure and impact"
+          }
+        ]
       },
-      "medicationGuidance": {
-        "currentMedications": "Advice for current medications",
-        "overTheCounter": "Recommended OTC medications",
-        "whenToSeekHelp": "When to consult a doctor",
-        "emergencyMedications": "Emergency medication protocols"
-      },
+      "temperatureEffect": "Analysis of how current temperature affects reported chronic conditions",
+      "generalRecommendations": [
+        "Indoor Air Quality: Tips for maintaining good indoor air quality",
+        "Activity Modifications: How to modify daily activities",
+        "Preventive Measures: General preventive measures",
+        "Emergency Protocols: What to do in case of severe symptoms"
+      ],
+      "medicationGuidance": [
+        "Current Medications: Advice for current medications",
+        "Over-the-Counter: Recommended OTC medications",
+        "When to Seek Help: When to consult a doctor",
+        "Emergency Medications: Emergency medication protocols"
+      ],
       "outdoorActivitySafety": {
         "isSafe": ${aqiData.value < 100},
-        "recommendation": "Clear advice about outdoor activities",
+        "recommendation": "Clear advice about outdoor activities considering health conditions",
         "timeRestrictions": "Best and worst times for outdoor activities",
         "activityModifications": "How to modify outdoor activities"
       },
       "maskRecommendations": {
-        "isRecommended": ${aqiData.value > 100},
-        "type": "Recommended mask type",
-        "usage": "How to use the mask",
+        "isRecommended": ${healthAssessment.chronicDiseases && healthAssessment.chronicDiseases.some(d => d.toLowerCase().includes('respiratory') || d.toLowerCase().includes('asthma') || d.toLowerCase().includes('copd') || d.toLowerCase().includes('lung')) || aqiData.value > 100},
+        "type": "Recommended mask type based on conditions and health status",
+        "usage": "How to use the mask in current temperature conditions",
         "maintenance": "Mask care and replacement guidelines"
+      },
+      "oxygenRecommendations": {
+        "isRecommended": ${healthAssessment.chronicDiseases && healthAssessment.chronicDiseases.some(d => d.toLowerCase().includes('respiratory') || d.toLowerCase().includes('asthma') || d.toLowerCase().includes('copd') || d.toLowerCase().includes('lung')) || aqiData.value > 200},
+        "recommendation": "Clear advice about oxygen support needs based on chronic diseases",
+        "level": "Recommended oxygen level if needed based on condition severity"
       }
     }
 
@@ -290,6 +352,70 @@ router.post('/generate', auth, async (req, res) => {
           ];
         }
 
+        // Process chronic disease analysis data
+        if (reportData.chronicDiseaseAnalysis && Array.isArray(reportData.chronicDiseaseAnalysis)) {
+          // The structure is already as expected, no need to transform
+        } else if (reportData.chronicDiseaseRecommendations && Array.isArray(reportData.chronicDiseaseRecommendations)) {
+          // Convert old format to new format
+          reportData.chronicDiseaseAnalysis = reportData.chronicDiseaseRecommendations.map(rec => {
+            // Extract disease name from the recommendation string
+            const colonIndex = rec.indexOf(':');
+            const diseaseName = colonIndex > 0 ? rec.substring(0, colonIndex).trim() : 'Chronic Disease';
+            const recommendation = colonIndex > 0 ? rec.substring(colonIndex + 1).trim() : rec;
+            
+            return {
+              diseaseName: diseaseName,
+              highlighted: true,
+              riskLevel: 'Moderate',
+              aqiImpact: `The current air quality (AQI: ${aqiData.value}) may affect ${diseaseName} symptoms.`,
+              recommendations: [recommendation],
+              precautions: [
+                `Monitor ${diseaseName} symptoms closely in current air quality conditions.`,
+                `Consider staying indoors during peak pollution hours.`
+              ],
+              medicationAdjustments: `Consult your doctor about adjusting medications for ${diseaseName} if symptoms worsen.`
+            };
+          });
+        } else {
+          // Create default chronic disease analysis if none provided
+          const chronicDiseases = healthAssessment.chronicDiseases || [];
+          reportData.chronicDiseaseAnalysis = chronicDiseases.map(disease => ({
+            diseaseName: disease,
+            highlighted: true,
+            riskLevel: aqiData.value > 150 ? 'High' : aqiData.value > 100 ? 'Moderate' : 'Low',
+            aqiImpact: `The current air quality (AQI: ${aqiData.value}) may affect ${disease} symptoms.`,
+            recommendations: [
+              `Monitor ${disease} symptoms closely with current AQI level of ${aqiData.value}.`,
+              `Keep medications readily available.`,
+              `Consider limiting outdoor exposure during peak pollution hours.`
+            ],
+            precautions: [
+              `Stay indoors when air quality is poor.`,
+              `Use air purifiers to improve indoor air quality.`
+            ],
+            medicationAdjustments: `Consult your doctor about adjusting medications for ${disease} if symptoms worsen.`
+          }));
+        }
+        
+        // Process pollutant impacts data
+        if (!reportData.pollutantImpacts) {
+          reportData.pollutantImpacts = {
+            overall: `The current pollutant levels may affect existing health conditions.`,
+            specificImpacts: aqiData.pollutants.map(pollutant => ({
+              pollutant: pollutant.name,
+              impact: `${pollutant.name} at ${pollutant.value} ${pollutant.unit} may affect respiratory health.`,
+              mitigationSteps: `Use air purifiers and limit outdoor exposure when ${pollutant.name} levels are high.`
+            }))
+          };
+        }
+        
+        // Process temperature effect data
+        if (!reportData.temperatureEffect) {
+          reportData.temperatureEffect = aqiData.temperature ?
+            `Current temperature of ${aqiData.temperature}${aqiData.temperatureUnit} may impact chronic conditions. Stay hydrated and avoid temperature extremes.` :
+            'Temperature data not available. Monitor your symptoms and adjust activities accordingly.';
+        }
+        
         // Create default data if any required fields are missing
         if (!reportData.outdoorActivitySafety) {
           const aqi = aqiData.value;
@@ -333,12 +459,21 @@ router.post('/generate', auth, async (req, res) => {
           value: aqiData.value,
           status: aqiData.status,
           pollutants: aqiData.pollutants,
+          temperature: aqiData.temperature,
+          temperatureUnit: aqiData.temperatureUnit || '°C',
           timestamp: new Date()
         },
         healthData: {
           name: healthAssessment.name,
           age: healthAssessment.age,
           symptoms: healthAssessment.symptoms,
+          chronicDiseases: (healthAssessment.chronicDiseases || []).map(disease => ({
+            name: disease,
+            severity: 'Moderate',
+            diagnosisYear: new Date().getFullYear(),
+            medications: [],
+            notes: ''
+          })),
           other: healthAssessment.other || '',
           assessmentDate: healthAssessment.timestamp
         },
@@ -350,7 +485,18 @@ router.post('/generate', auth, async (req, res) => {
           medicationGuidance: reportData.medicationGuidance,
           outdoorActivitySafety: reportData.outdoorActivitySafety,
           maskRecommendations: reportData.maskRecommendations,
+          chronicDiseaseAnalysis: reportData.chronicDiseaseAnalysis || [],
           timestamp: new Date()
+        },
+        oxygenRecommendations: reportData.oxygenRecommendations,
+        airQualityImpact: {
+          overallImpact: reportData.pollutantImpacts?.overall || `The current air quality (AQI: ${aqiData.value}) may affect your health conditions.`,
+          chronicDiseaseImpacts: (healthAssessment.chronicDiseases || []).map(disease => ({
+            diseaseName: disease,
+            impactLevel: aqiData.value > 150 ? 'Significant' : aqiData.value > 100 ? 'Moderate' : 'Minimal',
+            details: `${disease} may be affected by current air quality levels. Monitor symptoms closely.`
+          })),
+          temperatureEffect: reportData.temperatureEffect || `Current temperature conditions may impact your health.`
         }
       };
 
@@ -378,28 +524,20 @@ router.post('/generate', auth, async (req, res) => {
           },
           healthStatus: {
             reportedIssues: healthAssessment.symptoms,
+            chronicDiseases: healthReport.healthData.chronicDiseases.map(disease => ({
+              name: disease.name,
+              severity: disease.severity,
+              diagnosisYear: disease.diagnosisYear,
+              highlighted: true
+            })),
             additionalInfo: healthAssessment.other || '',
             lastAssessmentDate: healthAssessment.timestamp
           },
           recommendations: {
             healthSpecific: reportData.healthSpecificRecommendations,
-            ageSpecific: {
-              dailyActivities: reportData.ageSpecificRecommendations[0],
-              precautions: reportData.ageSpecificRecommendations[1],
-              specialConsiderations: reportData.ageSpecificRecommendations[2]
-            },
-            general: {
-              indoorAirQuality: reportData.generalRecommendations[0],
-              activityModifications: reportData.generalRecommendations[1],
-              preventiveMeasures: reportData.generalRecommendations[2],
-              emergencyProtocols: reportData.generalRecommendations[3]
-            },
-            medication: {
-              currentMedications: reportData.medicationGuidance[0],
-              overTheCounter: reportData.medicationGuidance[1],
-              whenToSeekHelp: reportData.medicationGuidance[2],
-              emergencyMedications: reportData.medicationGuidance[3]
-            }
+            ageSpecific: reportData.ageSpecificRecommendations,
+            general: reportData.generalRecommendations,
+            medication: reportData.medicationGuidance
           },
           outdoorActivitySafety: {
             isSafe: reportData.outdoorActivitySafety.isSafe,
@@ -412,6 +550,28 @@ router.post('/generate', auth, async (req, res) => {
             type: reportData.maskRecommendations.type,
             usage: reportData.maskRecommendations.usage,
             maintenance: reportData.maskRecommendations.maintenance
+          },
+          oxygenRecommendations: reportData.oxygenRecommendations,
+          chronicDiseaseAnalysis: {
+            diseases: healthReport.healthData.chronicDiseases.map(disease => ({
+              name: disease.name,
+              highlighted: true,
+              riskLevel: 'Moderate',
+              aqiImpact: `The current air quality (AQI: ${healthReport.aqiData.value}) may affect ${disease.name} symptoms.`,
+              recommendations: [
+                `Monitor ${disease.name} symptoms closely with current AQI level of ${healthReport.aqiData.value}.`,
+                `Keep medications readily available.`,
+                `Consider limiting outdoor exposure during peak pollution hours.`
+              ],
+              pollutantImpacts: healthReport.aqiData.pollutants.map(pollutant => ({
+                pollutantName: pollutant.name,
+                impactLevel: 'Moderate',
+                effect: `${pollutant.name} (${pollutant.value} ${pollutant.unit}) may exacerbate ${disease.name} symptoms.`
+              }))
+            })),
+            temperatureEffect: healthReport.aqiData.temperature ? 
+              `Current temperature of ${healthReport.aqiData.temperature}${healthReport.aqiData.temperatureUnit} may impact chronic conditions.` : 
+              'Temperature data not available.'
           }
         }
       };
