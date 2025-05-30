@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 
@@ -51,7 +51,51 @@ export default function ResponsiveHorizontalForm() {
   const [form, setForm] = useState(initialForm);
   const [submitting, setSubmitting] = useState(false);
   const [activeTab, setActiveTab] = useState("chronicDiseases");
+  const [existingAssessmentId, setExistingAssessmentId] = useState(null);
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    fetchLatestAssessment();
+  }, []);
+
+  const fetchLatestAssessment = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        setLoading(false);
+        return;
+      }
+
+      const response = await fetch(
+        "http://localhost:5000/api/health-assessment/latest",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      const data = await response.json();
+
+      if (response.ok && data.success && data.assessment) {
+        const assessment = data.assessment;
+        setForm({
+          name: assessment.name,
+          age: assessment.age.toString(),
+          chronicDiseases: assessment.chronicDiseases,
+          symptoms: assessment.symptoms,
+          other: assessment.other || "",
+          consent: assessment.consent,
+        });
+        setExistingAssessmentId(assessment._id);
+      }
+    } catch (error) {
+      console.error("Error fetching latest assessment:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -77,6 +121,11 @@ export default function ResponsiveHorizontalForm() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!validateForm()) {
+      toast.error("Please fill in all required fields correctly");
+      return;
+    }
+
     setSubmitting(true);
 
     try {
@@ -87,24 +136,25 @@ export default function ResponsiveHorizontalForm() {
         return;
       }
 
-      const response = await fetch(
-        "http://localhost:5000/api/health-assessment",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({
-            name: form.name.trim(),
-            age: Number(form.age),
-            chronicDiseases: form.chronicDiseases,
-            symptoms: form.symptoms,
-            other: form.other.trim(),
-            consent: form.consent,
-          }),
-        }
-      );
+      const url = existingAssessmentId
+        ? `http://localhost:5000/api/health-assessment/${existingAssessmentId}`
+        : "http://localhost:5000/api/health-assessment";
+
+      const response = await fetch(url, {
+        method: existingAssessmentId ? "PUT" : "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          name: form.name.trim(),
+          age: Number(form.age),
+          chronicDiseases: form.chronicDiseases,
+          symptoms: form.symptoms,
+          other: form.other.trim(),
+          consent: form.consent,
+        }),
+      });
 
       const data = await response.json();
 
@@ -115,7 +165,11 @@ export default function ResponsiveHorizontalForm() {
       }
 
       if (data.success) {
-        toast.success("Health assessment submitted successfully!");
+        toast.success(
+          existingAssessmentId
+            ? "Health assessment updated successfully!"
+            : "Health assessment submitted successfully!"
+        );
         setForm(initialForm);
         navigate("/");
       } else {
@@ -131,7 +185,19 @@ export default function ResponsiveHorizontalForm() {
 
   const handleReset = () => {
     setForm(initialForm);
+    setExistingAssessmentId(null);
   };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-primary-500 border-t-transparent rounded-full animate-spin mx-auto"></div>
+          <p className="mt-4 text-gray-600 dark:text-gray-400">Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <form
@@ -284,7 +350,11 @@ export default function ResponsiveHorizontalForm() {
           type="submit"
           disabled={submitting}
           className="px-6 py-2 font-medium text-white transition duration-150 ease-in-out rounded-lg bg-primary-600 hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed">
-          {submitting ? "Submitting..." : "Submit Assessment"}
+          {submitting
+            ? "Submitting..."
+            : existingAssessmentId
+            ? "Update Assessment"
+            : "Submit Assessment"}
         </button>
       </div>
     </form>
