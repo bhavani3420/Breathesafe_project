@@ -72,8 +72,8 @@ const Navbar = () => {
           </Link>
 
           {/* Desktop & Tablet Navigation */}
-          <div className="items-center hidden md:flex lg:space-x-8 md:space-x-4">
-            <div className="flex items-center md:space-x-2 lg:space-x-6">
+          <div className="items-center hidden lg:flex lg:space-x-8">
+            <div className="flex items-center lg:space-x-6">
               {navLinks.map(({ path, label }) => (
                 <Link
                   key={path}
@@ -88,7 +88,7 @@ const Navbar = () => {
               ))}
             </div>
 
-            <div className="flex items-center md:space-x-2 lg:space-x-4">
+            <div className="flex items-center lg:space-x-4">
               <button
                 type="button"
                 onClick={toggleTheme}
@@ -106,14 +106,14 @@ const Navbar = () => {
                   <button
                     type="button"
                     onClick={() => handleAuthClick("/login")}
-                    className="px-3 py-2 text-sm md:text-base btn-secondary">
+                    className="px-3 py-2 text-sm lg:text-base btn-secondary">
                     Login
                   </button>
 
                   <button
                     type="button"
                     onClick={() => handleAuthClick("/signup")}
-                    className="px-3 py-2 text-sm md:text-base btn-primary">
+                    className="px-3 py-2 text-sm lg:text-base btn-primary">
                     Sign Up
                   </button>
                 </>
@@ -122,7 +122,7 @@ const Navbar = () => {
           </div>
 
           {/* Mobile Menu Button */}
-          <div className="flex items-center space-x-4 md:hidden">
+          <div className="flex items-center space-x-4 lg:hidden">
             <button
               type="button"
               onClick={toggleTheme}
@@ -152,7 +152,7 @@ const Navbar = () => {
 
       {/* Mobile Menu */}
       <motion.div
-        className={`md:hidden ${isOpen ? "block" : "hidden"}`}
+        className={`lg:hidden ${isOpen ? "block" : "hidden"}`}
         initial={false}
         animate={
           isOpen ? { height: "auto", opacity: 1 } : { height: 0, opacity: 0 }

@@ -84,7 +84,6 @@ const AboutPage = () => {
 
   return (
     <div className="pt-16">
-  
       {/* Mission Section */}
       <section className="bg-white section dark:bg-dark-800">
         <div className="container-custom">
