@@ -23,11 +23,12 @@ const SignupPage = () => {
     password: "",
     phone: "",
     location: "",
+    city: "",
     aadharNumber: "",
     coordinates: {
       latitude: null,
-      longitude: null
-    }
+      longitude: null,
+    },
   });
   const [isLoading, setIsLoading] = useState(false);
   const [showMap, setShowMap] = useState(false);
@@ -43,21 +44,43 @@ const SignupPage = () => {
     }
   }, [showMap]);
 
-  const initializeMap = () => {
+  const initializeMap = async () => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
-        (position) => {
+        async (position) => {
           const { latitude, longitude } = position.coords;
-          setFormData((prev) => ({
-            ...prev,
-            location: `${latitude.toFixed(6)}, ${longitude.toFixed(6)}`,
-            coordinates: {
-              latitude: parseFloat(latitude.toFixed(6)),
-              longitude: parseFloat(longitude.toFixed(6))
-            }
-          }));
-          setShowMap(false);
-          toast.success("Location captured successfully!");
+
+          try {
+            // Get city name from coordinates using Nominatim API
+            const response = await fetch(
+              `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=10&addressdetails=1`
+            );
+            const data = await response.json();
+
+            // Extract city name from the response
+            const cityName =
+              data.address.city ||
+              data.address.town ||
+              data.address.village ||
+              data.address.county ||
+              "Unknown Location";
+
+            setFormData((prev) => ({
+              ...prev,
+              location: `${latitude.toFixed(6)}, ${longitude.toFixed(6)}`,
+              city: cityName,
+              coordinates: {
+                latitude: parseFloat(latitude.toFixed(6)),
+                longitude: parseFloat(longitude.toFixed(6)),
+              },
+            }));
+            setShowMap(false);
+            toast.success("Location captured successfully!");
+          } catch (error) {
+            console.error("Error getting location details:", error);
+            toast.error("Failed to get location details. Please try again.");
+            setShowMap(false);
+          }
         },
         (error) => {
           console.error("Error getting location:", error);
@@ -251,11 +274,11 @@ const SignupPage = () => {
               type="text"
               id="signup-location"
               name="location"
-              value={formData.location}
+              value={formData.city || formData.location}
               onChange={handleChange}
               required
               className="block w-full py-2 pl-10 pr-10 text-gray-900 placeholder-gray-500 bg-white border border-gray-300 rounded-lg dark:border-gray-600 dark:bg-dark-700 dark:text-white focus:outline-none focus:border-primary-500 focus:shadow-[0_0_0_2px_rgba(30,144,255,0.2)] transition-colors duration-200"
-              placeholder="Enter latitude, longitude"
+              placeholder="Click to detect location"
               readOnly
             />
             <button
