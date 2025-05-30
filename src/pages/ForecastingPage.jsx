@@ -302,31 +302,62 @@ const ForecastingPage = () => {
     setSearchError("");
     if ("geolocation" in navigator) {
       navigator.geolocation.getCurrentPosition(
-        (pos) => {
-          setCoordinates({
+        async (pos) => {
+          const newCoordinates = {
             latitude: pos.coords.latitude,
             longitude: pos.coords.longitude,
-          });
-          setLocationName("");
-          setPincode("");
-          setIsLoading(false);
+          };
+
+          try {
+            // Get city name from coordinates using Nominatim API
+            const response = await fetch(
+              `https://nominatim.openstreetmap.org/reverse?format=json&lat=${pos.coords.latitude}&lon=${pos.coords.longitude}&zoom=10&addressdetails=1`
+            );
+            const data = await response.json();
+
+            // Extract city name from the response
+            const cityName =
+              data.address.city ||
+              data.address.town ||
+              data.address.village ||
+              data.address.county ||
+              "Unknown Location";
+
+            // Update state with coordinates and city name
+            setCoordinates(newCoordinates);
+            setLocationName(cityName);
+            setLocationSearch(cityName); // Set the search input to the city name
+          } catch (error) {
+            console.error("Error in location detection:", error);
+            setSearchError("Failed to get location details. Please try again.");
+          } finally {
+            setIsLoading(false);
+          }
         },
         (err) => {
-          setSearchError("Unable to detect your location.");
-          setLocationName("");
-          setPincode("");
+          if (err.code === 1) {
+            setSearchError(
+              "Location access denied. Please allow location access in your browser settings for the most accurate air quality data."
+            );
+          } else if (err.code === 2) {
+            setSearchError(
+              "Location unavailable. Please ensure your device location is enabled."
+            );
+          } else if (err.code === 3) {
+            setSearchError("Location request timed out. Try again.");
+          } else {
+            setSearchError("Could not get your location.");
+          }
           setIsLoading(false);
         },
         {
-          enableHighAccuracy: true,
+          enableHighAccuracy: true, // Use GPS if available
           timeout: 20000,
           maximumAge: 0,
         }
       );
     } else {
-      setSearchError("Geolocation not supported.");
-      setLocationName("");
-      setPincode("");
+      setSearchError("Geolocation is not supported by your browser.");
       setIsLoading(false);
     }
   };
