@@ -185,6 +185,54 @@ const DiseaseInfoPage = () => {
       )
   );
 
+  // Animation variants
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1,
+      },
+    },
+  };
+
+  const cardVariants = {
+    hidden: {
+      opacity: 0,
+      y: 50,
+      scale: 0.95,
+    },
+    visible: {
+      opacity: 1,
+      y: 0,
+      scale: 1,
+      transition: {
+        type: "spring",
+        stiffness: 100,
+        damping: 15,
+      },
+    },
+    hover: {
+      scale: 1.02,
+      transition: {
+        type: "spring",
+        stiffness: 400,
+        damping: 10,
+      },
+    },
+  };
+
+  const contentVariants = {
+    hidden: { opacity: 0, x: -20 },
+    visible: {
+      opacity: 1,
+      x: 0,
+      transition: {
+        duration: 0.5,
+      },
+    },
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-dark-900">
       {/* Hero Section */}
@@ -192,19 +240,35 @@ const DiseaseInfoPage = () => {
         <div className="relative container-custom">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-100px" }}
             transition={{ duration: 0.5 }}
             className="max-w-3xl mx-auto text-center">
-            <h1 className="mb-4 text-4xl font-bold text-gray-900 dark:text-white sm:text-5xl">
+            <motion.h1
+              className="mb-4 text-4xl font-bold text-gray-900 dark:text-white sm:text-5xl"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.1 }}>
               Airborne Disease Information
-            </h1>
-            <p className="mb-8 text-lg text-gray-700 dark:text-gray-300">
+            </motion.h1>
+            <motion.p
+              className="mb-8 text-lg text-gray-700 dark:text-gray-300"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.2 }}>
               Learn about common airborne diseases and their relationship with
               air quality
-            </p>
+            </motion.p>
 
             {/* Search Bar */}
-            <div className="relative max-w-xl mx-auto">
+            <motion.div
+              className="relative max-w-xl mx-auto"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.3 }}>
               <div className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none">
                 <FiSearch className="w-5 h-5 text-gray-400" />
               </div>
@@ -215,43 +279,54 @@ const DiseaseInfoPage = () => {
                 placeholder="Search diseases, symptoms, or pollutants..."
                 className="w-full py-3 pl-12 pr-4 text-gray-900 bg-white rounded-lg shadow-lg focus:outline-none focus:ring-2 focus:ring-gray-400 dark:bg-dark-800 dark:text-white dark:placeholder-gray-400"
               />
-            </div>
+            </motion.div>
           </motion.div>
         </div>
       </div>
 
       {/* Disease Cards Section */}
       <div className="container-custom py-12">
-        <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
+        <motion.div
+          className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3"
+          variants={containerVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-100px" }}>
           {filteredDiseases.map((disease, index) => (
             <motion.div
               key={disease.name}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
+              variants={cardVariants}
+              whileHover="hover"
               className={`group relative overflow-hidden rounded-xl ${
                 isDarkMode
                   ? "bg-dark-800 border border-dark-700"
                   : "bg-white border border-gray-200"
               } shadow-lg hover:shadow-xl transition-all duration-300`}>
               {/* Card Header */}
-              <div className="p-6 border-b border-gray-200 dark:border-dark-700">
+              <motion.div
+                className="p-6 border-b border-gray-200 dark:border-dark-700"
+                variants={contentVariants}>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-3">
-                    <div className="p-2 text-gray-700 bg-gray-100 dark:bg-gray-700 dark:text-gray-300 rounded-lg">
+                    <motion.div
+                      className="p-2 text-gray-700 bg-gray-100 dark:bg-gray-700 dark:text-gray-300 rounded-lg"
+                      whileHover={{ rotate: 360 }}
+                      transition={{ duration: 0.5 }}>
                       {disease.icon}
-                    </div>
+                    </motion.div>
                     <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
                       {disease.name}
                     </h2>
                   </div>
-                  <button
+                  <motion.button
                     onClick={() => toggleSpeech(disease)}
                     className={`p-2 rounded-full transition-colors duration-200 ${
                       speakingDisease === disease.name
                         ? "bg-danger-500 hover:bg-danger-600 text-white"
                         : "bg-gray-100 hover:bg-gray-200 dark:bg-dark-700 dark:hover:bg-dark-600 text-gray-600 dark:text-gray-300"
                     }`}
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.9 }}
                     aria-label={
                       speakingDisease === disease.name ? "Stop" : "Listen"
                     }>
@@ -260,25 +335,29 @@ const DiseaseInfoPage = () => {
                     ) : (
                       <FiVolume2 className="w-5 h-5" />
                     )}
-                  </button>
+                  </motion.button>
                 </div>
-              </div>
+              </motion.div>
 
               {/* Card Content */}
-              <div className="p-6 space-y-6">
+              <motion.div className="p-6 space-y-6" variants={contentVariants}>
                 {/* Symptoms */}
                 <div>
                   <h3 className="mb-3 text-lg font-semibold text-gray-900 dark:text-white">
                     Symptoms
                   </h3>
                   <ul className="space-y-2">
-                    {disease.symptoms.map((symptom) => (
-                      <li
+                    {disease.symptoms.map((symptom, idx) => (
+                      <motion.li
                         key={symptom}
+                        initial={{ opacity: 0, x: -20 }}
+                        whileInView={{ opacity: 1, x: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ duration: 0.3, delay: idx * 0.1 }}
                         className="flex items-center text-gray-600 dark:text-gray-300">
                         <span className="w-1.5 h-1.5 mr-2 bg-gray-500 rounded-full" />
                         {symptom}
-                      </li>
+                      </motion.li>
                     ))}
                   </ul>
                 </div>
@@ -288,9 +367,14 @@ const DiseaseInfoPage = () => {
                   <h3 className="mb-3 text-lg font-semibold text-gray-900 dark:text-white">
                     Caused By
                   </h3>
-                  <p className="text-gray-600 dark:text-gray-300">
+                  <motion.p
+                    className="text-gray-600 dark:text-gray-300"
+                    initial={{ opacity: 0 }}
+                    whileInView={{ opacity: 1 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.5 }}>
                     {disease.causes}
-                  </p>
+                  </motion.p>
                 </div>
 
                 {/* Pollutants */}
@@ -299,27 +383,36 @@ const DiseaseInfoPage = () => {
                     Major Pollutants
                   </h3>
                   <div className="flex flex-wrap gap-2">
-                    {disease.pollutants.map((pollutant) => (
-                      <span
+                    {disease.pollutants.map((pollutant, idx) => (
+                      <motion.span
                         key={pollutant}
+                        initial={{ opacity: 0, scale: 0.8 }}
+                        whileInView={{ opacity: 1, scale: 1 }}
+                        viewport={{ once: true }}
+                        transition={{ duration: 0.3, delay: idx * 0.1 }}
                         className="px-3 py-1 text-sm text-gray-700 bg-gray-100 dark:bg-gray-700 dark:text-gray-300 rounded-full">
                         {pollutant}
-                      </span>
+                      </motion.span>
                     ))}
                   </div>
                 </div>
-              </div>
+              </motion.div>
             </motion.div>
           ))}
-        </div>
+        </motion.div>
 
         {/* No Results Message */}
         {filteredDiseases.length === 0 && (
-          <div className="py-12 text-center">
+          <motion.div
+            className="py-12 text-center"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5 }}>
             <p className="text-lg text-gray-600 dark:text-gray-400">
               No diseases found matching your search criteria.
             </p>
-          </div>
+          </motion.div>
         )}
       </div>
     </div>

@@ -486,22 +486,38 @@ const ForecastingPage = () => {
             isDarkMode ? "bg-dark-800 text-white" : "bg-white text-gray-900"
           }`}
           initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-100px" }}
           transition={{ duration: 0.5, delay: 0.3 }}>
           <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 gap-4">
-            <h2
+            <motion.h2
               className={`text-lg font-semibold ${
                 isDarkMode ? "text-white" : "text-gray-900"
-              }`}>
+              }`}
+              initial={{ opacity: 0, x: -20 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true, margin: "-100px" }}
+              transition={{ duration: 0.5, delay: 0.4 }}>
               24-Hour AQI & Pollutants Trend
-            </h2>
-            <ToggleSwitch
-              checked={showPollutants}
-              onChange={() => setShowPollutants((v) => !v)}
-              label="Show Pollutants"
-            />
+            </motion.h2>
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true, margin: "-100px" }}
+              transition={{ duration: 0.5, delay: 0.5 }}>
+              <ToggleSwitch
+                checked={showPollutants}
+                onChange={() => setShowPollutants((v) => !v)}
+                label="Show Pollutants"
+              />
+            </motion.div>
           </div>
-          <div className="h-[300px] sm:h-[400px] md:h-[500px]">
+          <motion.div
+            className="h-[300px] sm:h-[400px] md:h-[500px]"
+            initial={{ opacity: 0, scale: 0.95 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true, margin: "-100px" }}
+            transition={{ duration: 0.5, delay: 0.6 }}>
             <ResponsiveContainer width="100%" height="100%">
               <LineChart
                 data={forecastData}
@@ -569,6 +585,9 @@ const ForecastingPage = () => {
                   }}
                   activeDot={{ r: window.innerWidth < 640 ? 4 : 8 }}
                   name="AQI"
+                  animationDuration={1500}
+                  animationBegin={0}
+                  animationEasing="ease-out"
                 />
                 {showPollutants && (
                   <>
@@ -578,6 +597,9 @@ const ForecastingPage = () => {
                       stroke="#22D3EE"
                       strokeWidth={window.innerWidth < 640 ? 1 : 2}
                       name="PM2.5"
+                      animationDuration={1500}
+                      animationBegin={200}
+                      animationEasing="ease-out"
                     />
                     <Line
                       type="monotone"
@@ -585,6 +607,9 @@ const ForecastingPage = () => {
                       stroke="#F59E42"
                       strokeWidth={window.innerWidth < 640 ? 1 : 2}
                       name="PM10"
+                      animationDuration={1500}
+                      animationBegin={400}
+                      animationEasing="ease-out"
                     />
                     <Line
                       type="monotone"
@@ -592,6 +617,9 @@ const ForecastingPage = () => {
                       stroke="#F43F5E"
                       strokeWidth={window.innerWidth < 640 ? 1 : 2}
                       name="CO"
+                      animationDuration={1500}
+                      animationBegin={600}
+                      animationEasing="ease-out"
                     />
                     <Line
                       type="monotone"
@@ -599,6 +627,9 @@ const ForecastingPage = () => {
                       stroke="#8B5CF6"
                       strokeWidth={window.innerWidth < 640 ? 1 : 2}
                       name="NO₂"
+                      animationDuration={1500}
+                      animationBegin={800}
+                      animationEasing="ease-out"
                     />
                     <Line
                       type="monotone"
@@ -606,6 +637,9 @@ const ForecastingPage = () => {
                       stroke="#FBBF24"
                       strokeWidth={window.innerWidth < 640 ? 1 : 2}
                       name="SO₂"
+                      animationDuration={1500}
+                      animationBegin={1000}
+                      animationEasing="ease-out"
                     />
                     <Line
                       type="monotone"
@@ -613,12 +647,15 @@ const ForecastingPage = () => {
                       stroke="#10B981"
                       strokeWidth={window.innerWidth < 640 ? 1 : 2}
                       name="O₃"
+                      animationDuration={1500}
+                      animationBegin={1200}
+                      animationEasing="ease-out"
                     />
                   </>
                 )}
               </LineChart>
             </ResponsiveContainer>
-          </div>
+          </motion.div>
         </motion.div>
       </div>
     </div>

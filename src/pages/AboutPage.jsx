@@ -80,30 +80,49 @@ const AboutPage = () => {
             className="max-w-3xl mx-auto text-center"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
+            viewport={{ once: true, margin: "-100px" }}
             transition={{ duration: 0.6 }}>
-            <h2 className="mb-6 text-gray-900 heading-md dark:text-white">
+            <motion.h2
+              className="mb-6 text-gray-900 heading-md dark:text-white"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.1 }}>
               Our Mission
-            </h2>
-            <p className="mb-8 text-lg leading-relaxed text-gray-700 dark:text-gray-300">
+            </motion.h2>
+            <motion.p
+              className="mb-8 text-lg leading-relaxed text-gray-700 dark:text-gray-300"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.2 }}>
               We believe everyone has the right to breathe clean air.
               BreatheSafe provides accurate, real-time air quality data and
               personalized health insights to help you make informed decisions
               about your outdoor activities and take control of your respiratory
               health.
-            </p>
-            <div className="flex flex-col justify-center gap-4 sm:flex-row">
-              <button
+            </motion.p>
+            <motion.div
+              className="flex flex-col justify-center gap-4 sm:flex-row"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.3 }}>
+              <motion.button
                 onClick={() => handleButtonClick("/live-aqi")}
-                className="btn-primary">
+                className="btn-primary"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}>
                 Check Your Air Quality
-              </button>
-              <button
+              </motion.button>
+              <motion.button
                 onClick={() => handleButtonClick("/forecasting")}
-                className="btn-secondary">
+                className="btn-secondary"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}>
                 View AQI Forecast
-              </button>
-            </div>
+              </motion.button>
+            </motion.div>
           </motion.div>
         </div>
       </section>
@@ -115,14 +134,25 @@ const AboutPage = () => {
             className="mb-12 text-center"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5 }}>
-            <h2 className="mb-4 text-gray-900 heading-md dark:text-white">
+            viewport={{ once: true, margin: "-100px" }}
+            transition={{ duration: 0.6 }}>
+            <motion.h2
+              className="mb-4 text-gray-900 heading-md dark:text-white"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.1 }}>
               Our Values
-            </h2>
-            <p className="max-w-2xl mx-auto text-lg text-gray-600 dark:text-gray-400">
-              These core values guide everything we do at BreatheSafe.
-            </p>
+            </motion.h2>
+            <motion.p
+              className="max-w-2xl mx-auto text-lg text-gray-600 dark:text-gray-400"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.2 }}>
+              The principles that guide our mission to improve air quality
+              awareness and public health.
+            </motion.p>
           </motion.div>
 
           <motion.div
@@ -130,22 +160,23 @@ const AboutPage = () => {
             variants={containerVariants}
             initial="hidden"
             whileInView="visible"
-            viewport={{ once: true }}>
+            viewport={{ once: true, margin: "-100px" }}>
             {values.map((value, index) => (
-              <motion.div key={index} variants={itemVariants}>
-                <div className="h-full p-6 card">
-                  <div className="flex flex-col items-center text-center">
-                    <div className="p-3 mb-4 bg-primary-50 dark:bg-primary-900/30 rounded-xl">
-                      {value.icon}
-                    </div>
-                    <h3 className="mb-3 text-xl font-semibold text-gray-900 dark:text-white">
-                      {value.title}
-                    </h3>
-                    <p className="text-gray-600 dark:text-gray-400">
-                      {value.description}
-                    </p>
-                  </div>
+              <motion.div
+                key={index}
+                variants={itemVariants}
+                whileHover={{ y: -10 }}
+                transition={{ duration: 0.3 }}
+                className="p-6 bg-white rounded-xl shadow-lg dark:bg-dark-800">
+                <div className="mb-4 p-3 bg-primary-50 dark:bg-primary-900/30 rounded-xl inline-block">
+                  {value.icon}
                 </div>
+                <h3 className="mb-3 text-xl font-semibold text-gray-900 dark:text-white">
+                  {value.title}
+                </h3>
+                <p className="text-gray-600 dark:text-gray-400">
+                  {value.description}
+                </p>
               </motion.div>
             ))}
           </motion.div>

@@ -5,7 +5,7 @@ import {
   FiMapPin,
   FiAlertCircle,
   FiActivity,
-  FiHeart,  
+  FiHeart,
   FiChevronDown,
 } from "react-icons/fi";
 import HeroSection from "../components/home/HeroSection";
@@ -52,7 +52,12 @@ function FAQSection() {
   return (
     <section id="faq" className="section bg-gray-50 dark:bg-dark-900">
       <div className="container-custom">
-        <div className="max-w-3xl mx-auto">
+        <motion.div
+          className="max-w-3xl mx-auto"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-100px" }}
+          transition={{ duration: 0.6 }}>
           <div className="mb-10 text-center">
             <motion.h2
               className="mb-4 text-gray-900 heading-md dark:text-white"
@@ -72,11 +77,20 @@ function FAQSection() {
               helps you stay safe.
             </motion.p>
           </div>
-          <div className="space-y-4">
+          <motion.div
+            className="space-y-4"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, delay: 0.2 }}>
             {FAQS.map((faq, idx) => (
-              <div
+              <motion.div
                 key={idx}
-                className="bg-white shadow dark:bg-dark-800 rounded-xl">
+                className="bg-white shadow dark:bg-dark-800 rounded-xl"
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: idx * 0.1 }}>
                 <button
                   className="flex items-center justify-between w-full px-6 py-4 text-left focus:outline-none"
                   onClick={() => setOpenIndex(openIndex === idx ? null : idx)}
@@ -109,10 +123,10 @@ function FAQSection() {
                     </motion.div>
                   )}
                 </AnimatePresence>
-              </div>
+              </motion.div>
             ))}
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
       </div>
     </section>
   );
@@ -145,11 +159,11 @@ const HomePage = () => {
 
   const handleButtonClick = (path) => {
     if (!user) {
-      navigate('/login', { 
-        state: { 
+      navigate("/login", {
+        state: {
           background: location,
-          from: path 
-        } 
+          from: path,
+        },
       });
     } else {
       navigate(path);
@@ -196,32 +210,49 @@ const HomePage = () => {
             className="max-w-3xl mx-auto text-center"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
+            viewport={{ once: true, margin: "-100px" }}
             transition={{ duration: 0.6 }}>
-            <h2 className="mb-6 text-gray-900 heading-md dark:text-white">
+            <motion.h2
+              className="mb-6 text-gray-900 heading-md dark:text-white"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.1 }}>
               Our Mission
-            </h2>
-            <p className="mb-8 text-lg leading-relaxed text-gray-700 dark:text-gray-300">
+            </motion.h2>
+            <motion.p
+              className="mb-8 text-lg leading-relaxed text-gray-700 dark:text-gray-300"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.2 }}>
               We believe everyone has the right to breathe clean air.
               BreatheSafe provides accurate, real-time air quality data and
               personalized health insights to help you make informed decisions
               about your outdoor activities and take control of your respiratory
               health.
-            </p>
-            <div className="flex flex-col justify-center gap-4 sm:flex-row">
-              <button
-                onClick={() => handleButtonClick('/live-aqi')}
+            </motion.p>
+            <motion.div
+              className="flex flex-col justify-center gap-4 sm:flex-row"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.3 }}>
+              <motion.button
+                onClick={() => handleButtonClick("/live-aqi")}
                 className="btn-primary"
-              >
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}>
                 Check Your Air Quality
-              </button>
-              <button
-                onClick={() => handleButtonClick('/forecasting')}
+              </motion.button>
+              <motion.button
+                onClick={() => handleButtonClick("/forecasting")}
                 className="btn-secondary"
-              >
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}>
                 View AQI Forecast
-              </button>
-            </div>
+              </motion.button>
+            </motion.div>
           </motion.div>
         </div>
       </section>
@@ -229,13 +260,18 @@ const HomePage = () => {
       {/* Features Section */}
       <section id="features" className="section bg-gray-50 dark:bg-dark-900">
         <div className="container-custom">
-          <div className="mb-12 text-center">
+          <motion.div
+            className="mb-12 text-center"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-100px" }}
+            transition={{ duration: 0.6 }}>
             <motion.h2
               className="mb-4 text-gray-900 heading-md dark:text-white"
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.5 }}>
+              transition={{ duration: 0.5, delay: 0.1 }}>
               Powerful Features
             </motion.h2>
             <motion.p
@@ -243,20 +279,24 @@ const HomePage = () => {
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: 0.1 }}>
+              transition={{ duration: 0.5, delay: 0.2 }}>
               Everything you need to stay informed about the air you breathe and
               protect your health.
             </motion.p>
-          </div>
+          </motion.div>
 
           <motion.div
             className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4"
             variants={containerVariants}
             initial="hidden"
             whileInView="visible"
-            viewport={{ once: true }}>
+            viewport={{ once: true, margin: "-100px" }}>
             {features.map((feature, index) => (
-              <motion.div key={index} variants={itemVariants}>
+              <motion.div
+                key={index}
+                variants={itemVariants}
+                whileHover={{ y: -10 }}
+                transition={{ duration: 0.3 }}>
                 <FeatureCard
                   icon={feature.icon}
                   title={feature.title}
@@ -272,13 +312,18 @@ const HomePage = () => {
       <section id="contact" className="bg-white section dark:bg-dark-800">
         <div className="container-custom">
           <div className="max-w-5xl p-5 mx-auto sm:p-14">
-            <div className="mb-6 text-center sm:mb-8 sm:pl-4">
+            <motion.div
+              className="mb-6 text-center sm:mb-8 sm:pl-4"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-100px" }}
+              transition={{ duration: 0.6 }}>
               <motion.h2
                 className="mb-2 text-gray-900 heading-md dark:text-white"
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ duration: 0.5 }}>
+                transition={{ duration: 0.5, delay: 0.1 }}>
                 Get in Touch
               </motion.h2>
               <motion.p
@@ -286,14 +331,19 @@ const HomePage = () => {
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: 0.1 }}>
+                transition={{ duration: 0.5, delay: 0.2 }}>
                 Have questions or suggestions? We'd love to hear from you!
               </motion.p>
-            </div>
+            </motion.div>
 
-            <div className="max-w-4xl mx-auto">
+            <motion.div
+              className="max-w-4xl mx-auto"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.3 }}>
               <ContactForm />
-            </div>
+            </motion.div>
           </div>
         </div>
       </section>

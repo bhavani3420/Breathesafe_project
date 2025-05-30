@@ -600,128 +600,134 @@ const DashboardPage = () => {
 
     if (aqiHistory.length === 0) {
       return (
-        <div className="flex flex-col items-center justify-center h-64 text-gray-500">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="flex flex-col items-center justify-center h-64 text-gray-500">
           <FiClock className="w-12 h-12 mb-4" />
           <p>No AQI search history found</p>
-        </div>
+        </motion.div>
       );
     }
 
     return (
       <div className="w-full">
-        <div className="flex items-center justify-end mb-4">
-          {aqiHistory.length > 0 && (
-            <button
-              onClick={handleDeleteAllHistory}
-              className="px-4 py-2 font-semibold text-gray-800 transition-all bg-gray-200 rounded-lg dark:bg-slate-700 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2">
-              Delete All
-            </button>
-          )}
-        </div>
-
         {/* Desktop Table View */}
         <div className="hidden md:block w-full overflow-x-auto">
-          <table className="w-full min-w-[700px] table-auto rounded-xl overflow-hidden shadow-lg bg-white dark:bg-slate-800">
+          <motion.table
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="w-full min-w-[700px] table-auto rounded-xl overflow-hidden shadow-lg bg-white dark:bg-slate-800">
             <thead>
               <tr className="text-left border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-slate-700">
-                <th className="w-1/4 py-3 pb-4 pl-3 pr-4 text-gray-800 dark:text-gray-100">
+                <th className="w-1/4 py-4 pl-6 pr-4 text-gray-800 dark:text-gray-100">
                   Date & Time
                 </th>
-                <th className="w-1/4 py-3 pb-4 pr-4 text-gray-800 dark:text-gray-100">
+                <th className="w-1/4 py-4 pr-4 text-gray-800 dark:text-gray-100">
                   Location
                 </th>
-                <th className="w-1/6 py-3 pb-4 pr-4 text-gray-800 dark:text-gray-100">
+                <th className="w-1/6 py-4 pr-4 text-gray-800 dark:text-gray-100">
                   AQI
                 </th>
-                <th className="w-1/4 py-3 pb-4 pr-4 text-gray-800 dark:text-gray-100">
+                <th className="w-1/4 py-4 pr-4 text-gray-800 dark:text-gray-100">
                   Status
                 </th>
-                <th className="w-1/6 py-3 pb-4 text-gray-800 dark:text-gray-100">
+                <th className="w-1/6 py-4 text-gray-800 dark:text-gray-100">
                   Actions
                 </th>
               </tr>
             </thead>
             <tbody>
-              {aqiHistory.map((entry) => (
-                <tr
+              {aqiHistory.map((entry, index) => (
+                <motion.tr
                   key={entry._id}
-                  className="transition-colors border-b border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-slate-700">
-                  <td className="py-4 pl-3 pr-4 font-medium text-gray-700 whitespace-nowrap dark:text-gray-200">
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: index * 0.1 }}
+                  className="border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-slate-700/50 transition-colors">
+                  <td className="py-4 pl-6 pr-4 text-gray-700 dark:text-gray-300">
                     {new Date(entry.timestamp).toLocaleString()}
                   </td>
-                  <td className="py-4 pr-4 text-gray-700 break-words dark:text-gray-200">
-                    {entry.city}
+                  <td className="py-4 pr-4 text-gray-700 dark:text-gray-300">
+                    {entry.location}
                   </td>
-                  <td className="py-4 pr-4 text-lg font-bold text-blue-600 whitespace-nowrap dark:text-blue-300">
+                  <td className="py-4 pr-4 text-gray-700 dark:text-gray-300">
                     {entry.aqi}
                   </td>
-                  <td className="py-4 pr-4 whitespace-nowrap">
+                  <td className="py-4 pr-4">
                     <span
-                      className={`px-3 py-1 text-sm rounded-full font-semibold shadow-sm ${getStatusBadgeClasses(
+                      className={`px-3 py-1 text-sm font-medium rounded-full ${getStatusBadgeClasses(
                         entry.status
                       )}`}>
                       {entry.status}
                     </span>
                   </td>
-                  <td className="py-4 whitespace-nowrap">
-                    <button
+                  <td className="py-4">
+                    <motion.button
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
                       onClick={() => handleDelete(entry._id)}
-                      className="p-2 text-red-500 transition-all duration-200 bg-transparent rounded-full hover:bg-red-100 hover:text-red-700 dark:hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-red-400"
-                      title="Delete entry">
+                      className="p-2 text-gray-500 transition-colors rounded-full hover:text-danger-500 hover:bg-danger-50 dark:hover:bg-danger-900/20">
                       <FiTrash2 className="w-5 h-5" />
-                    </button>
+                    </motion.button>
                   </td>
-                </tr>
+                </motion.tr>
               ))}
             </tbody>
-          </table>
+          </motion.table>
         </div>
 
         {/* Mobile Card View */}
         <div className="md:hidden space-y-4">
-          {aqiHistory.map((entry) => (
-            <div
+          {aqiHistory.map((entry, index) => (
+            <motion.div
               key={entry._id}
-              className="p-4 bg-white dark:bg-slate-800 rounded-xl shadow-lg">
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: index * 0.1 }}
+              className="p-4 bg-white rounded-xl shadow-lg dark:bg-slate-800">
               <div className="flex items-center justify-between mb-3">
                 <span className="text-sm text-gray-500 dark:text-gray-400">
                   {new Date(entry.timestamp).toLocaleString()}
                 </span>
-                <button
+                <motion.button
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
                   onClick={() => handleDelete(entry._id)}
-                  className="p-2 text-red-500 transition-all duration-200 bg-transparent rounded-full hover:bg-red-100 hover:text-red-700 dark:hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-red-400"
-                  title="Delete entry">
+                  className="p-2 text-gray-500 transition-colors rounded-full hover:text-danger-500 hover:bg-danger-50 dark:hover:bg-danger-900/20">
                   <FiTrash2 className="w-5 h-5" />
-                </button>
+                </motion.button>
               </div>
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <span className="text-gray-700 dark:text-gray-200">
+                  <span className="text-gray-700 dark:text-gray-300">
                     Location:
                   </span>
                   <span className="font-medium text-gray-900 dark:text-white">
-                    {entry.city}
+                    {entry.location}
                   </span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-gray-700 dark:text-gray-200">AQI:</span>
-                  <span className="text-lg font-bold text-blue-600 dark:text-blue-300">
+                  <span className="text-gray-700 dark:text-gray-300">AQI:</span>
+                  <span className="font-medium text-gray-900 dark:text-white">
                     {entry.aqi}
                   </span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-gray-700 dark:text-gray-200">
+                  <span className="text-gray-700 dark:text-gray-300">
                     Status:
                   </span>
                   <span
-                    className={`px-3 py-1 text-sm rounded-full font-semibold shadow-sm ${getStatusBadgeClasses(
+                    className={`px-3 py-1 text-sm font-medium rounded-full ${getStatusBadgeClasses(
                       entry.status
                     )}`}>
                     {entry.status}
                   </span>
                 </div>
               </div>
-            </div>
+            </motion.div>
           ))}
         </div>
       </div>
@@ -754,28 +760,45 @@ const DashboardPage = () => {
             {/* Main Graphs */}
             <div className="grid grid-cols-1 gap-6 mb-8 lg:grid-cols-3">
               {/* Weekly AQI Trend */}
-              <div
+              <motion.div
                 className={`col-span-2 rounded-3xl p-6 shadow-lg ${getCardBg(
                   isDarkMode
-                )}`}>
-                <h2 className="mb-4 text-lg font-semibold">Weekly AQI Trend</h2>
-                <ResponsiveContainer width="100%" height={220}>
-                  <LineChart data={chartData.weeklyTrends}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#23263A" />
-                    <XAxis dataKey="name" stroke="#aaa" />
-                    <YAxis stroke="#aaa" />
-                    <Tooltip contentStyle={getTooltipStyle(isDarkMode)} />
-                    <Line
-                      type="monotone"
-                      dataKey="aqi"
-                      stroke="#7C3AED"
-                      strokeWidth={3}
-                      dot={{ r: 4, fill: "#fff" }}
-                      activeDot={{ r: 6 }}
-                    />
-                  </LineChart>
-                </ResponsiveContainer>
-              </div>
+                )}`}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-100px" }}
+                transition={{ duration: 0.5 }}>
+                <motion.h2
+                  className="mb-4 text-lg font-semibold"
+                  initial={{ opacity: 0, x: -20 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true, margin: "-100px" }}
+                  transition={{ duration: 0.5, delay: 0.2 }}>
+                  Weekly AQI Trend
+                </motion.h2>
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  whileInView={{ opacity: 1, scale: 1 }}
+                  viewport={{ once: true, margin: "-100px" }}
+                  transition={{ duration: 0.5, delay: 0.3 }}>
+                  <ResponsiveContainer width="100%" height={220}>
+                    <LineChart data={chartData.weeklyTrends}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#23263A" />
+                      <XAxis dataKey="name" stroke="#aaa" />
+                      <YAxis stroke="#aaa" />
+                      <Tooltip contentStyle={getTooltipStyle(isDarkMode)} />
+                      <Line
+                        type="monotone"
+                        dataKey="aqi"
+                        stroke="#7C3AED"
+                        strokeWidth={3}
+                        dot={{ r: 4, fill: "#fff" }}
+                        activeDot={{ r: 6 }}
+                      />
+                    </LineChart>
+                  </ResponsiveContainer>
+                </motion.div>
+              </motion.div>
 
               {/* Pollutant Breakdown */}
               <div
@@ -815,26 +838,43 @@ const DashboardPage = () => {
       case "activity":
         return (
           <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-            <div
-              className={`rounded-3xl p-6 shadow-lg ${getCardBg(isDarkMode)}`}>
-              <h2 className="mb-4 text-xl font-semibold">Weekly AQI Trend</h2>
-              <ResponsiveContainer width="100%" height={300}>
-                <LineChart data={chartData.weeklyTrends}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#23263A" />
-                  <XAxis dataKey="name" stroke="#aaa" />
-                  <YAxis stroke="#aaa" />
-                  <Tooltip contentStyle={getTooltipStyle(isDarkMode)} />
-                  <Line
-                    type="monotone"
-                    dataKey="aqi"
-                    stroke="#7C3AED"
-                    strokeWidth={3}
-                    dot={{ r: 4, fill: "#fff" }}
-                    activeDot={{ r: 6 }}
-                  />
-                </LineChart>
-              </ResponsiveContainer>
-            </div>
+            <motion.div
+              className={`rounded-3xl p-6 shadow-lg ${getCardBg(isDarkMode)}`}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-100px" }}
+              transition={{ duration: 0.5 }}>
+              <motion.h2
+                className="mb-4 text-xl font-semibold"
+                initial={{ opacity: 0, x: -20 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true, margin: "-100px" }}
+                transition={{ duration: 0.5, delay: 0.2 }}>
+                Weekly AQI Trend
+              </motion.h2>
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true, margin: "-100px" }}
+                transition={{ duration: 0.5, delay: 0.3 }}>
+                <ResponsiveContainer width="100%" height={300}>
+                  <LineChart data={chartData.weeklyTrends}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#23263A" />
+                    <XAxis dataKey="name" stroke="#aaa" />
+                    <YAxis stroke="#aaa" />
+                    <Tooltip contentStyle={getTooltipStyle(isDarkMode)} />
+                    <Line
+                      type="monotone"
+                      dataKey="aqi"
+                      stroke="#7C3AED"
+                      strokeWidth={3}
+                      dot={{ r: 4, fill: "#fff" }}
+                      activeDot={{ r: 6 }}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              </motion.div>
+            </motion.div>
             <div
               className={`rounded-3xl p-6 shadow-lg ${getCardBg(isDarkMode)}`}>
               <h2 className="mb-4 text-xl font-semibold">
@@ -869,20 +909,45 @@ const DashboardPage = () => {
 
       case "history":
         return (
-          <div className="space-y-6">
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-              AQI Search History
-            </h2>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="space-y-6">
+            <div className="flex items-center justify-between">
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+                AQI Search History
+              </h2>
+              {aqiHistory.length > 0 && (
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={handleDeleteAllHistory}
+                  className="px-4 py-2 font-semibold text-white transition-all bg-danger-500 rounded-lg hover:bg-danger-600 focus:outline-none focus:ring-2 focus:ring-danger-400 focus:ring-offset-2">
+                  Delete All
+                </motion.button>
+              )}
+            </div>
             {renderHistory()}
-          </div>
+          </motion.div>
         );
       case "settings":
         return (
-          <div className={`rounded-3xl p-6 shadow-lg ${getCardBg(isDarkMode)}`}>
-            <h2 className="mb-6 text-xl font-semibold">Profile Settings</h2>
-            <form className="space-y-6" onSubmit={handleSettingsSubmit}>
-              <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-                <div className="space-y-2">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className={`rounded-3xl p-8 shadow-lg ${getCardBg(isDarkMode)}`}>
+            <h2 className="mb-8 text-2xl font-bold text-gray-900 dark:text-white">
+              Profile Settings
+            </h2>
+            <form className="space-y-8" onSubmit={handleSettingsSubmit}>
+              <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
+                <motion.div
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.5, delay: 0.1 }}
+                  className="space-y-2">
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                     Full Name
                   </label>
@@ -890,11 +955,15 @@ const DashboardPage = () => {
                     name="fullName"
                     value={settings.fullName}
                     onChange={handleSettingsChange}
-                    className="w-full px-4 py-2 text-gray-900 placeholder-gray-500 bg-white border border-gray-200 rounded-lg dark:bg-dark-700 dark:border-gray-600 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                    className="w-full px-4 py-3 text-gray-900 placeholder-gray-500 bg-white border border-gray-200 rounded-lg dark:bg-dark-700 dark:border-gray-600 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200"
                     placeholder="Enter your full name"
                   />
-                </div>
-                <div className="space-y-2">
+                </motion.div>
+                <motion.div
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.5, delay: 0.2 }}
+                  className="space-y-2">
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                     Location
                   </label>
@@ -902,11 +971,15 @@ const DashboardPage = () => {
                     name="location"
                     value={settings.location}
                     onChange={handleSettingsChange}
-                    className="w-full px-4 py-2 text-gray-900 placeholder-gray-500 bg-white border border-gray-200 rounded-lg dark:bg-dark-700 dark:border-gray-600 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                    className="w-full px-4 py-3 text-gray-900 placeholder-gray-500 bg-white border border-gray-200 rounded-lg dark:bg-dark-700 dark:border-gray-600 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200"
                     placeholder="Enter your location"
                   />
-                </div>
-                <div className="space-y-2">
+                </motion.div>
+                <motion.div
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.5, delay: 0.3 }}
+                  className="space-y-2">
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                     Email
                   </label>
@@ -915,11 +988,15 @@ const DashboardPage = () => {
                     type="email"
                     value={settings.email}
                     onChange={handleSettingsChange}
-                    className="w-full px-4 py-2 text-gray-900 placeholder-gray-500 bg-white border border-gray-200 rounded-lg dark:bg-dark-700 dark:border-gray-600 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                    className="w-full px-4 py-3 text-gray-900 placeholder-gray-500 bg-white border border-gray-200 rounded-lg dark:bg-dark-700 dark:border-gray-600 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200"
                     placeholder="Enter your email"
                   />
-                </div>
-                <div className="space-y-2">
+                </motion.div>
+                <motion.div
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.5, delay: 0.4 }}
+                  className="space-y-2">
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                     Phone
                   </label>
@@ -927,11 +1004,15 @@ const DashboardPage = () => {
                     name="phone"
                     value={settings.phone}
                     onChange={handleSettingsChange}
-                    className="w-full px-4 py-2 text-gray-900 placeholder-gray-500 bg-white border border-gray-200 rounded-lg dark:bg-dark-700 dark:border-gray-600 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                    className="w-full px-4 py-3 text-gray-900 placeholder-gray-500 bg-white border border-gray-200 rounded-lg dark:bg-dark-700 dark:border-gray-600 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200"
                     placeholder="Enter your phone number"
                   />
-                </div>
-                <div className="space-y-2">
+                </motion.div>
+                <motion.div
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.5, delay: 0.5 }}
+                  className="space-y-2">
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                     New Password
                   </label>
@@ -940,28 +1021,36 @@ const DashboardPage = () => {
                     type="password"
                     value={settings.password}
                     onChange={handleSettingsChange}
-                    className="w-full px-4 py-2 text-gray-900 placeholder-gray-500 bg-white border border-gray-200 rounded-lg dark:bg-dark-700 dark:border-gray-600 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                    className="w-full px-4 py-3 text-gray-900 placeholder-gray-500 bg-white border border-gray-200 rounded-lg dark:bg-dark-700 dark:border-gray-600 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200"
                     placeholder="Enter new password (leave blank to keep current)"
                     autoComplete="new-password"
                   />
-                </div>
+                </motion.div>
               </div>
-              <div className="flex justify-end gap-4">
-                <button
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.6 }}
+                className="flex justify-end gap-4">
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
                   type="button"
                   onClick={handleResetSettings}
-                  className="px-6 py-2 text-gray-700 transition-colors bg-gray-100 rounded-lg hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600">
+                  className="px-6 py-3 text-gray-700 transition-colors bg-gray-100 rounded-lg hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600">
                   Clear Fields
-                </button>
-                <button
+                </motion.button>
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
                   type="submit"
                   disabled={isUpdating}
-                  className="px-6 py-2 text-white transition-colors rounded-lg bg-primary-500 hover:bg-primary-600 disabled:opacity-50 disabled:cursor-not-allowed">
+                  className="px-6 py-3 text-white transition-colors rounded-lg bg-primary-500 hover:bg-primary-600 disabled:opacity-50 disabled:cursor-not-allowed">
                   {isUpdating ? "Updating..." : "Save Changes"}
-                </button>
-              </div>
+                </motion.button>
+              </motion.div>
             </form>
-          </div>
+          </motion.div>
         );
       default:
         return null;
