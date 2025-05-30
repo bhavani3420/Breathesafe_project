@@ -58,21 +58,7 @@ const userSchema = new mongoose.Schema(
         },
         message: (props) => `${props.value} is not a valid Aadhar number!`,
       },
-    },
-    coordinates: {
-      latitude: {
-        type: Number,
-        required: [true, "Latitude is required"],
-        min: -90,
-        max: 90,
-      },
-      longitude: {
-        type: Number,
-        required: [true, "Longitude is required"],
-        min: -180,
-        max: 180,
-      },
-    },
+    }
   },
   {
     timestamps: true,

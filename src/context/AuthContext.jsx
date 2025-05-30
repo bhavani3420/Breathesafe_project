@@ -38,16 +38,7 @@ export const AuthProvider = ({ children }) => {
 
   const signup = async (userData) => {
     try {
-      // Ensure coordinates are properly formatted
-      const formattedData = {
-        ...userData,
-        coordinates: {
-          latitude: parseFloat(userData.coordinates.latitude),
-          longitude: parseFloat(userData.coordinates.longitude)
-        }
-      };
-
-      const response = await axios.post('http://localhost:5000/api/auth/signup', formattedData);
+      const response = await axios.post('http://localhost:5000/api/auth/signup', userData);
       const { token, user } = response.data;
       localStorage.setItem('token', token);
       localStorage.setItem('user', JSON.stringify(user));

@@ -16,7 +16,6 @@ router.post("/signup", async (req, res) => {
       location,
       city,
       aadharNumber,
-      coordinates,
     } = req.body;
 
     // Validate required fields
@@ -27,20 +26,11 @@ router.post("/signup", async (req, res) => {
       !phone ||
       !location ||
       !city ||
-      !aadharNumber ||
-      !coordinates
+      !aadharNumber
     ) {
       return res.status(400).json({
         success: false,
         message: "All fields are required",
-      });
-    }
-
-    // Validate coordinates
-    if (!coordinates.latitude || !coordinates.longitude) {
-      return res.status(400).json({
-        success: false,
-        message: "Both latitude and longitude are required",
       });
     }
 
@@ -62,7 +52,6 @@ router.post("/signup", async (req, res) => {
       location,
       city,
       aadharNumber,
-      coordinates,
     });
 
     await user.save();
@@ -200,7 +189,6 @@ router.put("/update-profile", auth, async (req, res) => {
       phone,
       location,
       aadharNumber,
-      coordinates,
     } = req.body;
     const userId = req.user.id;
 
@@ -231,7 +219,6 @@ router.put("/update-profile", auth, async (req, res) => {
       phone: user.phone,
       location: user.location,
       aadharNumber: user.aadharNumber,
-      coordinates: user.coordinates,
     };
 
     // Update fields if provided
@@ -241,16 +228,6 @@ router.put("/update-profile", auth, async (req, res) => {
     if (phone) user.phone = phone;
     if (location) user.location = location;
     if (aadharNumber) user.aadharNumber = aadharNumber;
-    if (coordinates) {
-      if (coordinates.latitude && coordinates.longitude) {
-        user.coordinates = coordinates;
-      } else {
-        return res.status(400).json({
-          success: false,
-          message: "Both latitude and longitude are required for coordinates",
-        });
-      }
-    }
 
     // Save the updated user
     await user.save();
@@ -267,14 +244,6 @@ router.put("/update-profile", auth, async (req, res) => {
       updatedFields.push(`Location: ${location}`);
     if (aadharNumber && aadharNumber !== oldValues.aadharNumber)
       updatedFields.push(`Aadhar Number: ${aadharNumber}`);
-    if (
-      coordinates &&
-      JSON.stringify(coordinates) !== JSON.stringify(oldValues.coordinates)
-    ) {
-      updatedFields.push(
-        `Coordinates: ${coordinates.latitude}, ${coordinates.longitude}`
-      );
-    }
 
     if (updatedFields.length > 0) {
       await sendMail(user.email, "settings", {
@@ -293,15 +262,13 @@ router.put("/update-profile", auth, async (req, res) => {
         phone: user.phone,
         location: user.location,
         aadharNumber: user.aadharNumber,
-        coordinates: user.coordinates,
       },
     });
   } catch (error) {
-    console.error("Error updating profile:", error);
+    console.error("Update profile error:", error);
     res.status(500).json({
       success: false,
       message: "Error updating profile",
-      error: error.message,
     });
   }
 });
@@ -326,7 +293,6 @@ router.get("/me", auth, async (req, res) => {
         phone: user.phone,
         location: user.location,
         aadharNumber: user.aadharNumber,
-        coordinates: user.coordinates,
       },
     });
   } catch (error) {

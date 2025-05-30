@@ -25,10 +25,6 @@ const SignupPage = () => {
     location: "",
     city: "",
     aadharNumber: "",
-    coordinates: {
-      latitude: null,
-      longitude: null,
-    },
   });
   const [isLoading, setIsLoading] = useState(false);
   const [showMap, setShowMap] = useState(false);
@@ -51,13 +47,14 @@ const SignupPage = () => {
           const { latitude, longitude } = position.coords;
 
           try {
-            // Get city name from coordinates using Nominatim API
+            // Get location details from coordinates using Nominatim API
             const response = await fetch(
               `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=10&addressdetails=1`
             );
             const data = await response.json();
 
-            // Extract city name from the response
+            // Extract location details from the response
+            const locationName = data.display_name || "Unknown Location";
             const cityName =
               data.address.city ||
               data.address.town ||
@@ -67,12 +64,8 @@ const SignupPage = () => {
 
             setFormData((prev) => ({
               ...prev,
-              location: `${latitude.toFixed(6)}, ${longitude.toFixed(6)}`,
+              location: locationName,
               city: cityName,
-              coordinates: {
-                latitude: parseFloat(latitude.toFixed(6)),
-                longitude: parseFloat(longitude.toFixed(6)),
-              },
             }));
             setShowMap(false);
             toast.success("Location captured successfully!");
