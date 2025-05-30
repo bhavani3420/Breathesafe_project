@@ -25,7 +25,11 @@ const LoginPage = () => {
       const result = await login(formData.email, formData.password);
       if (result.success) {
         toast.success("Logged in successfully!");
-        navigate("/");
+        if (location.state?.background && location.state?.from) {
+          navigate(location.state.from);
+        } else {
+          navigate("/");
+        }
       } else {
         toast.error(result.error || "Login failed. Please try again.");
       }

@@ -1,17 +1,34 @@
+import { useState } from "react";
 import { motion } from "framer-motion";
-import { Link } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import {
-  FiMapPin,
-  FiAlertCircle,
-  FiActivity,
   FiHeart,
+  FiShield,
   FiUsers,
-  FiTarget,
+  FiGlobe,
   FiAward,
+  FiTrendingUp,
 } from "react-icons/fi";
-import FeatureCard from "../components/home/FeatureCard";
+import { useAuth } from "../context/AuthContext";
 
 const AboutPage = () => {
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const handleButtonClick = (path) => {
+    if (!user) {
+      navigate('/login', { 
+        state: { 
+          background: location,
+          from: path 
+        } 
+      });
+    } else {
+      navigate(path);
+    }
+  };
+
   // Animation variants
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -32,60 +49,52 @@ const AboutPage = () => {
     },
   };
 
-  // Features data
-  const features = [
-    {
-      icon: <FiMapPin className="w-8 h-8 text-blue-500" />,
-      title: "Real-time AQI Monitoring",
-      description:
-        "Get accurate air quality data for your location, updated in real-time to keep you informed.",
-    },
-    {
-      icon: <FiHeart className="w-8 h-8 text-pink-500" />,
-      title: "Personalized Health Advice",
-      description:
-        "Receive tailored health recommendations based on the air quality and your personal health profile.",
-    },
-    {
-      icon: <FiActivity className="w-8 h-8 text-green-500" />,
-      title: "24-hour AQI Prediction",
-      description:
-        "Plan your day with confidence using our accurate machine learning powered AQI forecasts.",
-    },
-    {
-      icon: <FiAlertCircle className="w-8 h-8 text-red-500" />,
-      title: "Health Alerts",
-      description:
-        "Get immediate notifications when air quality poses a risk to your health in your area.",
-    },
-  ];
-
-  // Team values
+  // Values data
   const values = [
     {
-      icon: <FiUsers className="w-8 h-8 text-purple-500" />,
-      title: "Community First",
+      icon: <FiHeart className="w-8 h-8 text-primary-500" />,
+      title: "Health First",
       description:
-        "We prioritize the health and well-being of our community members above all else.",
+        "We prioritize your health and well-being by providing accurate air quality information and personalized health recommendations.",
     },
     {
-      icon: <FiTarget className="w-8 h-8 text-indigo-500" />,
-      title: "Data-Driven",
+      icon: <FiShield className="w-8 h-8 text-primary-500" />,
+      title: "Data Security",
       description:
-        "Our decisions and recommendations are based on accurate, real-time air quality data.",
+        "Your data privacy is our top priority. We ensure all your personal information and health data is securely protected.",
     },
     {
-      icon: <FiAward className="w-8 h-8 text-yellow-500" />,
-      title: "Excellence",
+      icon: <FiUsers className="w-8 h-8 text-primary-500" />,
+      title: "Community Focus",
       description:
-        "We strive for excellence in everything we do, from data accuracy to user experience.",
+        "We believe in building a community of informed citizens who can make better decisions for their health and environment.",
     },
   ];
 
   return (
     <div className="pt-16">
+      {/* Hero Section */}
+      <section className="relative pt-32 pb-20 overflow-hidden bg-gradient-to-br from-primary-500 to-primary-600">
+        <div className="absolute inset-0 bg-black/20" />
+        <div className="relative container-custom">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="max-w-3xl mx-auto text-center">
+            <h1 className="mb-4 text-4xl font-bold text-white sm:text-5xl">
+              About BreatheSafe
+            </h1>
+            <p className="mb-8 text-lg text-white/90">
+              Empowering communities with real-time air quality data and
+              personalized health insights.
+            </p>
+          </motion.div>
+        </div>
+      </section>
+
       {/* Mission Section */}
-      <section className="bg-white section dark:bg-dark-800">
+      <section className="section bg-white dark:bg-dark-800">
         <div className="container-custom">
           <motion.div
             className="max-w-3xl mx-auto text-center"
@@ -104,12 +113,18 @@ const AboutPage = () => {
               health.
             </p>
             <div className="flex flex-col justify-center gap-4 sm:flex-row">
-              <Link to="/live-aqi" className="btn-primary">
+              <button
+                onClick={() => handleButtonClick('/live-aqi')}
+                className="btn-primary"
+              >
                 Check Your Air Quality
-              </Link>
-              <Link to="/forecasting" className="btn-secondary">
+              </button>
+              <button
+                onClick={() => handleButtonClick('/forecasting')}
+                className="btn-secondary"
+              >
                 View AQI Forecast
-              </Link>
+              </button>
             </div>
           </motion.div>
         </div>

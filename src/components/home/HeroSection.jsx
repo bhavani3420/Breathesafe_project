@@ -1,9 +1,13 @@
 import { useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
 
 const HeroSection = () => {
   const canvasRef = useRef(null);
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
 
   // Earth animation effect
   useEffect(() => {
@@ -40,35 +44,12 @@ const HeroSection = () => {
     const animate = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       
-      // Draw earth circle
-      const centerX = canvas.width / 2;
-      const centerY = canvas.height / 2;
-      const radius = Math.min(canvas.width, canvas.height) * 0.2;
-      
-      // Create gradient for earth
-      const gradient = ctx.createRadialGradient(
-        centerX, centerY, 0, centerX, centerY, radius
-      );
-      gradient.addColorStop(0, '#1E90FF');
-      gradient.addColorStop(0.8, '#104E8B');
-      
-      ctx.beginPath();
-      ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
-      ctx.fillStyle = gradient;
-      ctx.fill();
-      
-      // Update and draw particles
       particles.forEach(particle => {
         particle.x += particle.speedX;
         particle.y += particle.speedY;
         
-        // Reset particles that go off screen
-        if (particle.x < 0 || particle.x > canvas.width) {
-          particle.x = Math.random() * canvas.width;
-        }
-        if (particle.y < 0 || particle.y > canvas.height) {
-          particle.y = Math.random() * canvas.height;
-        }
+        if (particle.x < 0 || particle.x > canvas.width) particle.speedX *= -1;
+        if (particle.y < 0 || particle.y > canvas.height) particle.speedY *= -1;
         
         ctx.beginPath();
         ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
@@ -79,15 +60,32 @@ const HeroSection = () => {
       animationFrameId = requestAnimationFrame(animate);
     };
 
-    window.addEventListener('resize', resizeCanvas);
+    const handleResize = () => {
+      resizeCanvas();
+    };
+
+    window.addEventListener('resize', handleResize);
     resizeCanvas();
     animate();
 
     return () => {
-      window.removeEventListener('resize', resizeCanvas);
+      window.removeEventListener('resize', handleResize);
       cancelAnimationFrame(animationFrameId);
     };
   }, []);
+
+  const handleButtonClick = (path) => {
+    if (!user) {
+      navigate('/login', { 
+        state: { 
+          background: location,
+          from: path 
+        } 
+      });
+    } else {
+      navigate(path);
+    }
+  };
 
   return (
     <section className="relative min-h-[90vh] flex items-center overflow-hidden bg-gradient-to-b from-white to-gray-100 dark:from-dark-900 dark:to-dark-800">
@@ -111,8 +109,8 @@ const HeroSection = () => {
               Make informed decisions about your outdoor activities and protect your respiratory health.
             </p>
             <div className="flex flex-wrap gap-4">
-              <Link
-                to="/live-aqi"
+              <button
+                onClick={() => handleButtonClick('/live-aqi')}
                 className="btn-primary text-lg group"
               >
                 <span>Get Started</span>
@@ -123,13 +121,13 @@ const HeroSection = () => {
                 >
                   →
                 </motion.span>
-              </Link>
-              <Link
-                to="/forecasting"
+              </button>
+              <button
+                onClick={() => handleButtonClick('/forecasting')}
                 className="btn-secondary text-lg"
               >
                 AQI Forecasting
-              </Link>
+              </button>
             </div>
             <div className="mt-8 flex items-center text-gray-600 dark:text-gray-400">
               <span className="inline-block w-3 h-3 bg-success-500 rounded-full mr-2"></span>

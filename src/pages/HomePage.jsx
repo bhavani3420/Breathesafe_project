@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Link, NavLink } from "react-router-dom";
+import { Link, NavLink, useNavigate, useLocation } from "react-router-dom";
 import {
   FiMapPin,
   FiAlertCircle,
@@ -11,6 +11,7 @@ import {
 import HeroSection from "../components/home/HeroSection";
 import FeatureCard from "../components/home/FeatureCard";
 import ContactForm from "../components/home/ContactForm";
+import { useAuth } from "../context/AuthContext";
 
 const FAQS = [
   {
@@ -118,6 +119,10 @@ function FAQSection() {
 }
 
 const HomePage = () => {
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
+
   // Animation variants
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -136,6 +141,19 @@ const HomePage = () => {
       opacity: 1,
       transition: { duration: 0.6, ease: "easeOut" },
     },
+  };
+
+  const handleButtonClick = (path) => {
+    if (!user) {
+      navigate('/login', { 
+        state: { 
+          background: location,
+          from: path 
+        } 
+      });
+    } else {
+      navigate(path);
+    }
   };
 
   // Features data
@@ -166,15 +184,6 @@ const HomePage = () => {
     },
   ];
 
-  const handleGetStarted = () => {
-    if (!isAuthenticated) {
-      // Show login modal/form
-      setShowLogin(true);
-    } else {
-      navigate("/dashboard");
-    }
-  };
-
   return (
     <div className="pt-16">
       {/* Hero Section */}
@@ -200,12 +209,18 @@ const HomePage = () => {
               health.
             </p>
             <div className="flex flex-col justify-center gap-4 sm:flex-row">
-              <Link to="/live-aqi" className="btn-primary">
+              <button
+                onClick={() => handleButtonClick('/live-aqi')}
+                className="btn-primary"
+              >
                 Check Your Air Quality
-              </Link>
-              <Link to="/forecasting" className="btn-secondary">
+              </button>
+              <button
+                onClick={() => handleButtonClick('/forecasting')}
+                className="btn-secondary"
+              >
                 View AQI Forecast
-              </Link>
+              </button>
             </div>
           </motion.div>
         </div>
