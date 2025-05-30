@@ -59,13 +59,7 @@ const AQICard = ({ aqiData, coordinates, isLoading }) => {
       <div className="p-6 border-b border-gray-200 dark:border-dark-700">
         <div className="flex items-center justify-between">
           <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Current AQI</h2>
-          <span className="text-sm text-gray-600 dark:text-gray-400">
-            Last updated: {safeUpdated}
-          </span>
         </div>
-        <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
-          Location: {coordinates?.latitude?.toFixed(4) ?? '--'}, {coordinates?.longitude?.toFixed(4) ?? '--'}
-        </p>
       </div>
       
       {/* AQI Value */}
