@@ -92,18 +92,22 @@ const fetchForecastData = async (location) => {
   try {
     // Clean and format location name
     const cleanLocation = location.trim().replace(/\s+/g, " ");
+    
+    // Extract just the city name (first part before any comma)
+    const cityName = cleanLocation.split(',')[0].trim();
+    console.log(`Original location: ${cleanLocation}, Using city name: ${cityName}`);
 
     // Use Open-Meteo's geocoding API to get coordinates for the location
     const geocodingUrl = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(
-      cleanLocation
+      cityName
     )}&count=5&language=en`;
     const geocodingResponse = await fetch(geocodingUrl);
     const geocodingData = await geocodingResponse.json();
 
     if (!geocodingData.results || geocodingData.results.length === 0) {
-      console.error(`Location not found: ${cleanLocation}`);
+      console.error(`Location not found: ${cityName} (extracted from ${cleanLocation})`);
       throw new Error(
-        `Location not found: ${cleanLocation}. Please check the spelling or try a nearby major city.`
+        `Location not found: ${cityName} (extracted from ${cleanLocation}). Please check the spelling or try a nearby major city.`
       );
     }
 
@@ -111,9 +115,9 @@ const fetchForecastData = async (location) => {
     const bestMatch =
       geocodingData.results.find(
         (result) =>
-          result.name.toLowerCase() === cleanLocation.toLowerCase() ||
-          result.admin1?.toLowerCase() === cleanLocation.toLowerCase() ||
-          result.country?.toLowerCase() === cleanLocation.toLowerCase()
+          result.name.toLowerCase() === cityName.toLowerCase() ||
+          result.admin1?.toLowerCase() === cityName.toLowerCase() ||
+          result.country?.toLowerCase() === cityName.toLowerCase()
       ) || geocodingData.results[0];
 
     const { latitude, longitude } = bestMatch;
@@ -238,21 +242,49 @@ const getMaskRecommendation = (aqi, symptoms = [], chronicDiseases = [], age = 3
 
 // Function to create concise SMS message
 const createSMSMessage = (location, time, aqi, pollutants, symptoms, chronicDiseases, age, temperature) => {
-  const timeStr = formatTime(time);
-  const aqiStatus = getAQIDescription(aqi);
+  // Extract just the city name for shorter location
+  const cityName = location.split(',')[0].trim();
+  
+  // Format date more concisely
+  const date = new Date(time);
+  const shortTimeStr = `${date.getMonth()+1}/${date.getDate()} ${date.getHours()}:${String(date.getMinutes()).padStart(2, '0')}`;
   
   // Get mask recommendation
   const maskRec = getMaskRecommendation(aqi, symptoms, chronicDiseases, age, temperature);
   
-  const message =
-    `⚠️ AQI Alert: ${location}\n` +
-    `Date & Time: ${timeStr}\n` +
-    `AQI: ${Math.round(aqi)} (${aqiStatus})\n` +
-    `PM2.5: ${Math.round(pollutants.PM2_5)} μg/m³\n` +
-    `Temperature: ${temperature ? Math.round(temperature) + '°C' : 'N/A'}\n` +
-    `\n🔴 Mask Recommendation: ${maskRec.status.toUpperCase()}\n` +
-    `Type: ${maskRec.type}\n` +
-    `Note: ${maskRec.note}`;
+  // Set AQI level description
+  let aqiLevel = "";
+  if (aqi <= 50) aqiLevel = "Good";
+  else if (aqi <= 100) aqiLevel = "Moderate";
+  else if (aqi <= 150) aqiLevel = "Sensitive Groups";
+  else if (aqi <= 200) aqiLevel = "Unhealthy";
+  else if (aqi <= 300) aqiLevel = "Very Unhealthy";
+  else aqiLevel = "Hazardous";
+  
+  // Use the actual forecast time passed to the function
+  // Format time in a readable way (e.g., "May 31, 10:30 AM")
+  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  const month = months[time.getMonth()];
+  const day = time.getDate();
+  const hours = time.getHours();
+  const minutes = String(time.getMinutes()).padStart(2, '0');
+  const ampm = hours >= 12 ? 'PM' : 'AM';
+  const hour12 = hours % 12 || 12; // Convert 0 to 12 for 12 AM
+  const readableTime = `${month} ${day}, ${hour12}:${minutes} ${ampm}`;
+  
+  // Create a more readable message with line breaks
+  const message = `BreathSafe Alert for ${cityName}\n` +
+                  `Forecast for: ${readableTime}\n` +
+                  `AQI: ${Math.round(aqi)} (${aqiLevel})\n` +
+                  `PM2.5: ${Math.round(pollutants.PM2_5)} μg/m³\n` +
+                  `Temp: ${temperature ? Math.round(temperature) + '°C' : 'N/A'}\n` +
+                  `Mask: ${maskRec.status}`;
+  
+  // Check length and truncate if necessary
+  if (message.length > 150) {
+    return message.substring(0, 147) + '...';
+  }
+  
   return message;
 };
 
@@ -289,14 +321,29 @@ const processAlerts = async () => {
 
         let alertsSent = 0;
 
-        // Process next 24 hours of data
-        for (let i = 0; i < 24; i++) {
+        // Find the current hour index in the forecast data
+        const now = new Date();
+        const currentHourIndex = forecastData.hourly.time.findIndex(timeStr => {
+          const forecastTime = new Date(timeStr);
+          return forecastTime.getDate() === now.getDate() && 
+                 forecastTime.getHours() === now.getHours();
+        });
+        
+        // If current hour not found, start from the first available hour
+        const startIndex = currentHourIndex !== -1 ? currentHourIndex : 0;
+        
+        // Process next 24 hours of data from current hour
+        console.log(`Processing forecast data starting from index ${startIndex} (${new Date(forecastData.hourly.time[startIndex]).toLocaleString()})`);
+        
+        for (let i = startIndex; i < startIndex + 24 && i < forecastData.hourly.time.length; i++) {
           const aqi = Math.round(forecastData.hourly.us_aqi[i]);
           const timestamp = new Date(forecastData.hourly.time[i]);
           const formattedTime = formatTime(timestamp);
+          
+          console.log(`Checking forecast for ${timestamp.toLocaleString()}, AQI: ${aqi}`);
 
           // Only process if AQI is above 150 (Unhealthy)
-          if (aqi > 150) {
+          if (aqi > 88) {
             const pollutants = {
               PM2_5: Math.round(forecastData.hourly.pm2_5[i]),
               PM10: Math.round(forecastData.hourly.pm10[i]),
@@ -393,16 +440,17 @@ const processAlerts = async () => {
 
 // Schedule alerts to run at 10 AM daily
 const scheduleAlerts = () => {
-  const cronSchedule = "35 03 * * *"; // Run at 10 AM (24-hour format)
+  const cronSchedule = "02 11 * * *"; // Run at 11:02 AM (24-hour format)
   cron.schedule(cronSchedule, async () => {
-    console.log("Running scheduled alerts check at 11:22...");
+    console.log(`Running scheduled alerts check at ${new Date().toLocaleTimeString()}...`);
     await processAlerts();
   });
-  console.log("SMS alerts scheduled to run at 10:00 daily");
+  console.log(`SMS alerts scheduled to run at ${cronSchedule} daily`);
 };
 
-// Export both functions
+// Export functions
 module.exports = {
   processAlerts,
   scheduleAlerts,
+  createSMSMessage
 };
