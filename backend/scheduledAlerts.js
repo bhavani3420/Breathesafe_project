@@ -2,6 +2,7 @@ const cron = require("node-cron");
 const mongoose = require("mongoose");
 const User = require("./models/User");
 const Alert = require("./models/Alert");
+const HealthAssessment = require("./models/HealthAssessment");
 const sendSMS = require("./sendSMS");
 
 // AQI Ranges for reference
@@ -130,25 +131,128 @@ const fetchForecastData = async (location) => {
       throw new Error(`No air quality data available for ${bestMatch.name}`);
     }
 
-    return aqiData;
+    // Fetch temperature data from Open Meteo
+    const weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&hourly=temperature_2m&timezone=auto`;
+    
+    const weatherResponse = await fetch(weatherUrl);
+    const weatherData = await weatherResponse.json();
+
+    if (!weatherData || !weatherData.hourly) {
+      console.warn(`No temperature data available for ${bestMatch.name}`);
+    }
+
+    // Combine AQI and temperature data
+    const combinedData = {
+      ...aqiData,
+      temperature: weatherData?.hourly?.temperature_2m || []
+    };
+
+    return combinedData;
   } catch (error) {
     console.error("Error fetching forecast data:", error);
     throw error;
   }
 };
 
-// Function to create concise SMS message
-const createSMSMessage = (location, time, aqi, pollutants) => {
-  const timeStr = formatTime(time);
+// Function to determine mask recommendation based on AQI, health symptoms, chronic diseases, and temperature
+const getMaskRecommendation = (aqi, symptoms = [], chronicDiseases = [], age = 30, temperature) => {
+  // Default recommendation
+  let recommendation = "recommended";
+  let maskType = "N95 or KN95 mask";
+  let additionalNote = "";
+  
+  // Base recommendation on AQI level
+  if (aqi >= 300) {
+    recommendation = "mandatory";
+  } else if (aqi >= 200) {
+    recommendation = "strongly recommended";
+  } else if (aqi >= 150) {
+    recommendation = "recommended";
+  }
+  
+  // Check for respiratory symptoms
+  const hasRespiratorySymptoms = symptoms.some(symptom => 
+    ["cough", "shortness of breath", "wheezing", "chest pain"].includes(symptom.toLowerCase())
+  );
+  
+  // Check for respiratory diseases
+  const hasRespiratoryDisease = chronicDiseases.some(disease => 
+    ["asthma", "copd", "bronchitis", "emphysema"].includes(disease.toLowerCase())
+  );
+  
+  // Check for cardiovascular diseases
+  const hasCardiovascularDisease = chronicDiseases.some(disease => 
+    ["heart disease", "hypertension", "high blood pressure"].includes(disease.toLowerCase())
+  );
+  
+  // Check for immune system issues
+  const hasImmuneIssue = chronicDiseases.some(disease => 
+    ["immunodeficiency", "diabetes", "cancer"].includes(disease.toLowerCase())
+  );
+  
+  // Check for pregnancy
+  const isPregnant = chronicDiseases.some(disease => 
+    disease.toLowerCase().includes("pregnant") || disease.toLowerCase().includes("pregnancy")
+  );
+  
+  // Adjust recommendation based on health factors
+  if (hasRespiratorySymptoms || hasRespiratoryDisease) {
+    // Respiratory issues - highest priority
+    if (recommendation === "recommended") {
+      recommendation = "strongly recommended";
+    } else if (recommendation === "strongly recommended") {
+      recommendation = "mandatory";
+    }
+    maskType = "N95 or KN95 mask with valve for easier breathing";
+    additionalNote = "Consider using a bronchodilator before going outside if prescribed by your doctor. ";
+  } 
+  else if (hasCardiovascularDisease || hasImmuneIssue || isPregnant || age >= 65 || age <= 12) {
+    // Other vulnerable conditions
+    if (recommendation === "recommended") {
+      recommendation = "strongly recommended";
+    }
+    additionalNote = "Limit outdoor exposure when possible. ";
+  }
+  
+  // Adjust based on temperature
+  if (temperature > 35) { // Hot weather
+    return {
+      status: recommendation,
+      type: maskType,
+      note: additionalNote + "Use a lightweight mask due to high temperature. Take frequent breaks in air-conditioned spaces."
+    };
+  } else if (temperature < 10) { // Cold weather
+    return {
+      status: recommendation,
+      type: maskType,
+      note: additionalNote + "Consider a mask with a heat exchanger for comfort in cold weather."
+    };
+  } else { // Moderate temperature
+    return {
+      status: recommendation,
+      type: maskType,
+      note: additionalNote + "Standard protection recommended."
+    };
+  }
+};
 
+// Function to create concise SMS message
+const createSMSMessage = (location, time, aqi, pollutants, symptoms, chronicDiseases, age, temperature) => {
+  const timeStr = formatTime(time);
   const aqiStatus = getAQIDescription(aqi);
+  
+  // Get mask recommendation
+  const maskRec = getMaskRecommendation(aqi, symptoms, chronicDiseases, age, temperature);
+  
   const message =
     `⚠️ AQI Alert: ${location}\n` +
     `Date & Time: ${timeStr}\n` +
     `AQI: ${Math.round(aqi)} (${aqiStatus})\n` +
     `PM2.5: ${Math.round(pollutants.PM2_5)} μg/m³\n` +
-    `PM10: ${Math.round(pollutants.PM10)} μg/m³\n` +
-    `NO2: ${Math.round(pollutants.NO2)} μg/m³`;
+    `Temperature: ${temperature ? Math.round(temperature) + '°C' : 'N/A'}\n` +
+    `\n🔴 Mask Recommendation: ${maskRec.status.toUpperCase()}\n` +
+    `Type: ${maskRec.type}\n` +
+    `Note: ${maskRec.note}`;
   return message;
 };
 
@@ -202,16 +306,53 @@ const processAlerts = async () => {
               O3: Math.round(forecastData.hourly.ozone[i]),
             };
 
-            // Create and send SMS
+            // Get temperature for this hour if available
+            const temperature = forecastData.temperature && forecastData.temperature[i] ? forecastData.temperature[i] : null;
+
+            // Fetch user's latest health assessment data from the database
+            let healthSymptoms = [];
+            let chronicDiseases = [];
+            let age = 30; // Default age if not found
+
+            try {
+              // Find the most recent health assessment for this user
+              const latestHealthAssessment = await HealthAssessment.findOne(
+                { userId: user._id },
+                { symptoms: 1, chronicDiseases: 1, age: 1 }
+              ).sort({ timestamp: -1 });
+
+              if (latestHealthAssessment) {
+                healthSymptoms = latestHealthAssessment.symptoms || [];
+                chronicDiseases = latestHealthAssessment.chronicDiseases || [];
+                age = latestHealthAssessment.age || 30;
+                console.log(`Found health assessment for user ${user.fullName}`);
+              } else {
+                console.log(`No health assessment found for user ${user.fullName}, using default values`);
+              }
+            } catch (error) {
+              console.error(`Error fetching health assessment for user ${user._id}:`, error);
+            }
+
+            // Create and send SMS with health assessment data and temperature
             const message = createSMSMessage(
               user.location,
               timestamp,
               aqi,
-              pollutants
+              pollutants,
+              healthSymptoms,
+              chronicDiseases,
+              age,
+              temperature
             );
             console.log("alert message detected:" + formattedTime);
             console.log(
               "alert message: AQI " + aqi + " (" + getAQIDescription(aqi) + ")"
+            );
+            console.log(
+              "Temperature: " + (temperature ? Math.round(temperature) + "°C" : "N/A") + 
+              ", Health Symptoms: " + (healthSymptoms.length > 0 ? healthSymptoms.join(", ") : "none") +
+              ", Chronic Diseases: " + (chronicDiseases.length > 0 ? chronicDiseases.join(", ") : "none") +
+              ", Age: " + age
             );
 
             await sendSMS(message, user.phone);
@@ -252,7 +393,7 @@ const processAlerts = async () => {
 
 // Schedule alerts to run at 10 AM daily
 const scheduleAlerts = () => {
-  const cronSchedule = "09 14 * * *"; // Run at 10 AM (24-hour format)
+  const cronSchedule = "35 03 * * *"; // Run at 10 AM (24-hour format)
   cron.schedule(cronSchedule, async () => {
     console.log("Running scheduled alerts check at 11:22...");
     await processAlerts();
