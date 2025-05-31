@@ -42,6 +42,11 @@ const userSchema = new mongoose.Schema(
       required: [true, "Location is required"],
       trim: true,
     },
+    city: {
+      type: String,
+      required: [true, "City name is required"],
+      trim: true,
+    },
     aadharNumber: {
       type: String,
       required: [true, "Aadhar number is required"],
@@ -53,21 +58,7 @@ const userSchema = new mongoose.Schema(
         },
         message: (props) => `${props.value} is not a valid Aadhar number!`,
       },
-    },
-    coordinates: {
-      latitude: {
-        type: Number,
-        required: [true, "Latitude is required"],
-        min: -90,
-        max: 90,
-      },
-      longitude: {
-        type: Number,
-        required: [true, "Longitude is required"],
-        min: -180,
-        max: 180,
-      },
-    },
+    }
   },
   {
     timestamps: true,
@@ -76,24 +67,16 @@ const userSchema = new mongoose.Schema(
 
 // Hash password before saving
 userSchema.pre("save", async function (next) {
-  try {
-    if (this.isModified("password")) {
-      this.password = await bcrypt.hash(this.password, 8);
-    }
-    next();
-  } catch (error) {
-    next(error);
-  }
+  if (!this.isModified("password")) return next();
+  this.password = await bcrypt.hash(this.password, 12);
+  next();
 });
 
 // Method to compare password
 userSchema.methods.comparePassword = async function (candidatePassword) {
-  try {
-    return await bcrypt.compare(candidatePassword, this.password);
-  } catch (error) {
-    throw new Error("Error comparing passwords");
-  }
+  return await bcrypt.compare(candidatePassword, this.password);
 };
 
 const User = mongoose.model("User", userSchema);
+
 module.exports = User;

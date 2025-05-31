@@ -1,37 +1,45 @@
-const express = require('express');
-const jwt = require('jsonwebtoken');
-const User = require('../models/User');
-const sendMail = require('../sendMail');
-const auth = require('../middleware/auth');
+const express = require("express");
+const jwt = require("jsonwebtoken");
+const User = require("../models/User");
+const sendMail = require("../sendMail");
+const auth = require("../middleware/auth");
 const router = express.Router();
 
 // Signup route
-router.post('/signup', async (req, res) => {
+router.post("/signup", async (req, res) => {
   try {
-    const { fullName, email, password, phone, location, aadharNumber, coordinates } = req.body;
-    
-    // Validate required fields
-    if (!fullName || !email || !password || !phone || !location || !aadharNumber || !coordinates) {
-      return res.status(400).json({ 
-        success: false,
-        message: 'All fields are required' 
-      });
-    }
+    const {
+      fullName,
+      email,
+      password,
+      phone,
+      location,
+      city,
+      aadharNumber,
+    } = req.body;
 
-    // Validate coordinates
-    if (!coordinates.latitude || !coordinates.longitude) {
+    // Validate required fields
+    if (
+      !fullName ||
+      !email ||
+      !password ||
+      !phone ||
+      !location ||
+      !city ||
+      !aadharNumber
+    ) {
       return res.status(400).json({
         success: false,
-        message: 'Both latitude and longitude are required'
+        message: "All fields are required",
       });
     }
 
     // Check if user already exists
     const existingUser = await User.findOne({ email });
     if (existingUser) {
-      return res.status(400).json({ 
+      return res.status(400).json({
         success: false,
-        message: 'User already exists' 
+        message: "User already exists",
       });
     }
 
@@ -42,135 +50,146 @@ router.post('/signup', async (req, res) => {
       password,
       phone,
       location,
+      city,
       aadharNumber,
-      coordinates
     });
 
     await user.save();
 
     // Send welcome email
-    await sendMail(email, 'signup', fullName);
+    await sendMail(email, "signup", fullName);
 
     // Generate token
     const token = jwt.sign(
       { userId: user._id },
-      process.env.JWT_SECRET || 'your-secret-key',
-      { expiresIn: '24h' }
+      process.env.JWT_SECRET || "your-secret-key",
+      { expiresIn: "24h" }
     );
 
     res.status(201).json({
       success: true,
-      message: 'User created successfully',
+      message: "User created successfully",
       token,
       user: {
         id: user._id,
         fullName: user.fullName,
-        email: user.email
-      }
+        email: user.email,
+        city: user.city,
+      },
     });
   } catch (error) {
-    console.error('Signup error:', error);
-    res.status(500).json({ 
+    console.error("Signup error:", error);
+    res.status(500).json({
       success: false,
-      message: 'Error creating user', 
-      error: error.message 
+      message: "Error creating user",
+      error: error.message,
     });
   }
 });
 
 // Login route
-router.post('/login', async (req, res) => {
+router.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
 
     // Validate required fields
     if (!email || !password) {
-      return res.status(400).json({ 
+      return res.status(400).json({
         success: false,
-        message: 'Email and password are required' 
+        message: "Email and password are required",
       });
     }
 
     // Find user
     const user = await User.findOne({ email });
     if (!user) {
-      return res.status(401).json({ 
+      return res.status(401).json({
         success: false,
-        message: 'Invalid credentials' 
+        message: "Invalid credentials",
       });
     }
 
     // Check password
     const isMatch = await user.comparePassword(password);
     if (!isMatch) {
-      return res.status(401).json({ 
+      return res.status(401).json({
         success: false,
-        message: 'Invalid credentials' 
+        message: "Invalid credentials",
       });
     }
 
     // Send login notification email
-    await sendMail(email, 'login', user.fullName);
+    await sendMail(email, "login", user.fullName);
 
     // Generate token
     const token = jwt.sign(
       { userId: user._id },
-      process.env.JWT_SECRET || 'your-secret-key',
-      { expiresIn: '24h' }
+      process.env.JWT_SECRET || "your-secret-key",
+      { expiresIn: "24h" }
     );
 
     res.json({
       success: true,
-      message: 'Login successful',
+      message: "Login successful",
       token,
       user: {
         id: user._id,
         fullName: user.fullName,
-        email: user.email
-      }
+        email: user.email,
+      },
     });
   } catch (error) {
-    console.error('Login error:', error);
-    res.status(500).json({ 
+    console.error("Login error:", error);
+    res.status(500).json({
       success: false,
-      message: 'Error logging in', 
-      error: error.message 
+      message: "Error logging in",
+      error: error.message,
     });
   }
 });
 
 // Logout route
-router.post('/logout', async (req, res) => {
+router.post("/logout", async (req, res) => {
   try {
-    const token = req.header('Authorization')?.replace('Bearer ', '');
-    
+    const token = req.header("Authorization")?.replace("Bearer ", "");
+
     if (!token) {
-      return res.status(401).json({ 
+      return res.status(401).json({
         success: false,
-        message: 'No token provided' 
+        message: "No token provided",
       });
     }
 
     // Verify the token
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key');
-    
-    res.json({ 
+    const decoded = jwt.verify(
+      token,
+      process.env.JWT_SECRET || "your-secret-key"
+    );
+
+    res.json({
       success: true,
-      message: 'Logged out successfully'
+      message: "Logged out successfully",
     });
   } catch (error) {
-    console.error('Logout error:', error);
-    res.status(401).json({ 
+    console.error("Logout error:", error);
+    res.status(401).json({
       success: false,
-      message: 'Invalid token'
+      message: "Invalid token",
     });
   }
 });
 
 // Update user profile route
-router.put('/update-profile', auth, async (req, res) => {
+router.put("/update-profile", auth, async (req, res) => {
   try {
-    const { fullName, email, password, phone, location, aadharNumber, coordinates } = req.body;
+    const {
+      fullName,
+      email,
+      password,
+      phone,
+      location,
+      aadharNumber,
+    } = req.body;
     const userId = req.user.id;
 
     // Find user
@@ -178,7 +197,7 @@ router.put('/update-profile', auth, async (req, res) => {
     if (!user) {
       return res.status(404).json({
         success: false,
-        message: 'User not found'
+        message: "User not found",
       });
     }
 
@@ -188,7 +207,7 @@ router.put('/update-profile', auth, async (req, res) => {
       if (existingUser) {
         return res.status(400).json({
           success: false,
-          message: 'Email is already taken'
+          message: "Email is already taken",
         });
       }
     }
@@ -200,7 +219,6 @@ router.put('/update-profile', auth, async (req, res) => {
       phone: user.phone,
       location: user.location,
       aadharNumber: user.aadharNumber,
-      coordinates: user.coordinates
     };
 
     // Update fields if provided
@@ -210,41 +228,33 @@ router.put('/update-profile', auth, async (req, res) => {
     if (phone) user.phone = phone;
     if (location) user.location = location;
     if (aadharNumber) user.aadharNumber = aadharNumber;
-    if (coordinates) {
-      if (coordinates.latitude && coordinates.longitude) {
-        user.coordinates = coordinates;
-      } else {
-        return res.status(400).json({
-          success: false,
-          message: 'Both latitude and longitude are required for coordinates'
-        });
-      }
-    }
 
     // Save the updated user
     await user.save();
 
     // Send email notification with updated settings
     const updatedFields = [];
-    if (fullName && fullName !== oldValues.fullName) updatedFields.push(`Full Name: ${fullName}`);
-    if (email && email !== oldValues.email) updatedFields.push(`Email: ${email}`);
-    if (phone && phone !== oldValues.phone) updatedFields.push(`Phone: ${phone}`);
-    if (location && location !== oldValues.location) updatedFields.push(`Location: ${location}`);
-    if (aadharNumber && aadharNumber !== oldValues.aadharNumber) updatedFields.push(`Aadhar Number: ${aadharNumber}`);
-    if (coordinates && JSON.stringify(coordinates) !== JSON.stringify(oldValues.coordinates)) {
-      updatedFields.push(`Coordinates: ${coordinates.latitude}, ${coordinates.longitude}`);
-    }
+    if (fullName && fullName !== oldValues.fullName)
+      updatedFields.push(`Full Name: ${fullName}`);
+    if (email && email !== oldValues.email)
+      updatedFields.push(`Email: ${email}`);
+    if (phone && phone !== oldValues.phone)
+      updatedFields.push(`Phone: ${phone}`);
+    if (location && location !== oldValues.location)
+      updatedFields.push(`Location: ${location}`);
+    if (aadharNumber && aadharNumber !== oldValues.aadharNumber)
+      updatedFields.push(`Aadhar Number: ${aadharNumber}`);
 
     if (updatedFields.length > 0) {
-      await sendMail(user.email, 'settings', {
+      await sendMail(user.email, "settings", {
         name: user.fullName,
-        updatedFields: updatedFields.join('\n')
+        updatedFields: updatedFields.join("\n"),
       });
     }
 
     res.json({
       success: true,
-      message: 'Profile updated successfully',
+      message: "Profile updated successfully",
       user: {
         id: user._id,
         fullName: user.fullName,
@@ -252,27 +262,25 @@ router.put('/update-profile', auth, async (req, res) => {
         phone: user.phone,
         location: user.location,
         aadharNumber: user.aadharNumber,
-        coordinates: user.coordinates
-      }
+      },
     });
   } catch (error) {
-    console.error('Error updating profile:', error);
+    console.error("Update profile error:", error);
     res.status(500).json({
       success: false,
-      message: 'Error updating profile',
-      error: error.message
+      message: "Error updating profile",
     });
   }
 });
 
 // Get current user data
-router.get('/me', auth, async (req, res) => {
+router.get("/me", auth, async (req, res) => {
   try {
-    const user = await User.findById(req.user.id).select('-password');
+    const user = await User.findById(req.user.id).select("-password");
     if (!user) {
       return res.status(404).json({
         success: false,
-        message: 'User not found'
+        message: "User not found",
       });
     }
 
@@ -285,35 +293,34 @@ router.get('/me', auth, async (req, res) => {
         phone: user.phone,
         location: user.location,
         aadharNumber: user.aadharNumber,
-        coordinates: user.coordinates
-      }
+      },
     });
   } catch (error) {
-    console.error('Error fetching user data:', error);
+    console.error("Error fetching user data:", error);
     res.status(500).json({
       success: false,
-      message: 'Error fetching user data',
-      error: error.message
+      message: "Error fetching user data",
+      error: error.message,
     });
   }
 });
 
 // Get total users count
-router.get('/total-users', auth, async (req, res) => {
+router.get("/total-users", auth, async (req, res) => {
   try {
     const count = await User.countDocuments();
     res.json({
       success: true,
-      count
+      count,
     });
   } catch (error) {
-    console.error('Error fetching total users:', error);
+    console.error("Error fetching total users:", error);
     res.status(500).json({
       success: false,
-      message: 'Error fetching total users count',
-      error: error.message
+      message: "Error fetching total users count",
+      error: error.message,
     });
   }
 });
 
-module.exports = router; 
+module.exports = router;

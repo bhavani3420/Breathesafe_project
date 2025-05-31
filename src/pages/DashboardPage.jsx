@@ -651,7 +651,7 @@ const DashboardPage = () => {
                     {new Date(entry.timestamp).toLocaleString()}
                   </td>
                   <td className="py-4 pr-4 text-gray-700 dark:text-gray-300">
-                    {entry.location}
+                    {entry.city}
                   </td>
                   <td className="py-4 pr-4 text-gray-700 dark:text-gray-300">
                     {entry.aqi}
@@ -706,7 +706,7 @@ const DashboardPage = () => {
                     Location:
                   </span>
                   <span className="font-medium text-gray-900 dark:text-white">
-                    {entry.location}
+                    {entry.city}
                   </span>
                 </div>
                 <div className="flex items-center justify-between">
