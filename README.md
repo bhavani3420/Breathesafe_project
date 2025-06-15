@@ -1,8 +1,36 @@
-# React + Vite
+# 🌿 BreatheSafe
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+**An AI-powered real-time AQI monitoring and health advisory system**
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 📌 Overview
+
+BreatheSafe helps users stay safe by:
+- Tracking real-time AQI using public APIs
+- Giving personalized health advice (based on age and health conditions)
+- Sending alerts when AQI rises
+- Recommending appropriate masks (e.g., N95)
+- Predicting AQI trends using machine learning
+
+---
+
+## 🚀 Features
+
+- 📡 Live AQI Tracking
+- 👤 Personalized Health Guidance
+- 📲 Real-Time Alerts
+- 😷 Mask Recommendations
+- 📈 AQI Trend Prediction
+- 🧑‍💻 Clean, Interactive Dashboard
+
+---
+
+
+
+## 🧪 How to Run
+
+### 1. Clone the repository
+```bash
+git clone https://github.com/KMSMANIKANTA/HACKVYUHA25.git
+cd HACKVYUHA25
