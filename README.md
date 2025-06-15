@@ -32,5 +32,5 @@ BreatheSafe helps users stay safe by:
 
 ### 1. Clone the repository
 ```bash
-git clone https://github.com/KMSMANIKANTA/HACKVYUHA25.git
-cd HACKVYUHA25
+git clone https://github.com/bhavani3420/Breathesafe_project.git
+
